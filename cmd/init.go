@@ -1,0 +1,32 @@
+package cmd
+
+import (
+	"log"
+
+	"github.com/corani/adr/internal"
+	"github.com/spf13/cobra"
+)
+
+// initCmd represents the init command
+var initCmd = &cobra.Command{
+	Use:   "init [path]",
+	Short: "initialize the adr path (default is `docs/adr`)",
+	Args:  cobra.MaximumNArgs(1),
+	Run: func(cmd *cobra.Command, args []string) {
+		path := "docs/adr"
+
+		if len(args) > 0 {
+			path = args[0]
+		}
+
+		if err := internal.Init(path); err != nil {
+			log.Printf("couldn't initialize adr: %v", err)
+
+			return
+		}
+	},
+}
+
+func init() {
+	rootCmd.AddCommand(initCmd)
+}
