@@ -40,11 +40,6 @@ link: {{.Link}}
 ---
 # {{.Number}}. {{.Title}}
 
-| Key    | Value       |
-| ------ | ----------- |
-| Date   | {{.Date}}   |
-| Status | {{.Status}} |
-
 # Context
 
 # Decision
