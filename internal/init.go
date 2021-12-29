@@ -38,7 +38,7 @@ date: {{.Date}}
 status: {{.Status}}
 link: {{.Link}}
 ---
-# {{.Number}}. {{.Title}}
+# ADR-{{printf "%04d" .Number}}. {{.Title}}
 
 # Context
 
