@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/adrg/frontmatter"
+	"github.com/corani/adr/internal/config"
 	"github.com/gosimple/slug"
 	"gopkg.in/yaml.v2"
 )
@@ -58,7 +59,9 @@ func Parse(path string) (*Adr, error) {
 	return &adr, nil
 }
 
-func Index(root string) (Adrs, error) {
+func Index(conf *config.Config) (Adrs, error) {
+	root := filepath.Join(conf.Project, conf.Root)
+
 	files, err := os.ReadDir(root)
 	if err != nil {
 		return nil, err
@@ -83,8 +86,8 @@ func Index(root string) (Adrs, error) {
 	return list, nil
 }
 
-func Create(root string, title string) (*Adr, error) {
-	list, err := Index(root)
+func Create(conf *config.Config, title string) (*Adr, error) {
+	list, err := Index(conf)
 	if err != nil {
 		return nil, err
 	}
@@ -108,12 +111,12 @@ func Create(root string, title string) (*Adr, error) {
 		Link:     0,
 	}
 
-	tmpl, err := template.ParseFiles(filepath.Join(root, "template.md"))
+	tmpl, err := template.ParseFiles(filepath.Join(conf.Project, conf.Template))
 	if err != nil {
 		return nil, err
 	}
 
-	f, err := os.Create(filepath.Join(root, adr.Filename))
+	f, err := os.Create(filepath.Join(conf.Project, conf.Root, adr.Filename))
 	if err != nil {
 		return nil, err
 	}
@@ -124,13 +127,13 @@ func Create(root string, title string) (*Adr, error) {
 	return &adr, nil
 }
 
-func Update(root string, adr *Adr) error {
+func Update(conf *config.Config, adr *Adr) error {
 	front, err := yaml.Marshal(adr)
 	if err != nil {
 		return err
 	}
 
-	f, err := os.Create(filepath.Join(root, adr.Filename))
+	f, err := os.Create(filepath.Join(conf.Project, conf.Root, adr.Filename))
 	if err != nil {
 		return err
 	}

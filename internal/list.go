@@ -5,16 +5,17 @@ import (
 	"os"
 
 	"github.com/corani/adr/internal/adr"
+	"github.com/corani/adr/internal/config"
 	"github.com/jedib0t/go-pretty/v6/table"
 )
 
 func List() error {
-	root, err := AdrRoot()
+	conf, err := config.ReadConfig()
 	if err != nil {
 		return err
 	}
 
-	list, err := adr.Index(root)
+	list, err := adr.Index(conf)
 	if err != nil {
 		return err
 	}
