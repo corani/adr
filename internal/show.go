@@ -16,34 +16,28 @@ func Show(id int) error {
 		return err
 	}
 
-	list, err := adr.Index(conf)
+	found, err := adr.ById(conf, adr.Number(id))
 	if err != nil {
 		return err
 	}
 
-	for _, v := range list {
-		if v.Number == adr.Number(id) {
-			t := table.NewWriter()
+	t := table.NewWriter()
 
-			t.SetOutputMirror(os.Stdout)
-			t.SetStyle(table.StyleRounded)
-			t.AppendRows([]table.Row{
-				{"Filename", v.Filename},
-				{"Number", fmt.Sprintf("%04d", v.Number)},
-				{"Date", v.Date},
-				{"Status", v.Status},
-			})
+	t.SetOutputMirror(os.Stdout)
+	t.SetStyle(table.StyleRounded)
+	t.AppendRows([]table.Row{
+		{"Filename", found.Filename},
+		{"Number", fmt.Sprintf("%04d", found.Number)},
+		{"Date", found.Date},
+		{"Status", found.Status},
+	})
 
-			t.Render()
+	t.Render()
 
-			out := markdown.Render(string(v.Body), 80, 1)
+	out := markdown.Render(string(found.Body), 80, 1)
 
-			fmt.Println()
-			fmt.Println(string(out))
+	fmt.Println()
+	fmt.Println(string(out))
 
-			return nil
-		}
-	}
-
-	return fmt.Errorf("file not found")
+	return nil
 }

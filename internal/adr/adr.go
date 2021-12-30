@@ -1,6 +1,7 @@
 package adr
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -39,6 +40,42 @@ type Adr struct {
 
 type Adrs map[Number]*Adr
 
+var ErrForEachStop = errors.New("stop iterating")
+
+func ForEach(conf *config.Config, fn func(*Adr) error) error {
+	list, err := List(conf)
+	if err != nil {
+		return err
+	}
+
+	for _, adr := range list {
+		if err := fn(adr); err != nil {
+			if errors.Is(err, ErrForEachStop) {
+				break
+			}
+
+			return err
+		}
+	}
+
+	return nil
+}
+
+func ById(conf *config.Config, id Number) (*Adr, error) {
+	list, err := List(conf)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, v := range list {
+		if v.Number == id {
+			return v, nil
+		}
+	}
+
+	return nil, os.ErrNotExist
+}
+
 func Parse(path string) (*Adr, error) {
 	f, err := os.Open(path)
 	if err != nil {
@@ -59,7 +96,7 @@ func Parse(path string) (*Adr, error) {
 	return &adr, nil
 }
 
-func Index(conf *config.Config) (Adrs, error) {
+func List(conf *config.Config) (Adrs, error) {
 	root := filepath.Join(conf.Project, conf.Root)
 
 	files, err := os.ReadDir(root)
@@ -87,17 +124,17 @@ func Index(conf *config.Config) (Adrs, error) {
 }
 
 func Create(conf *config.Config, title string) (*Adr, error) {
-	list, err := Index(conf)
-	if err != nil {
-		return nil, err
-	}
-
 	var id Number
 
-	for k := range list {
-		if k > id {
-			id = k
+	err := ForEach(conf, func(v *Adr) error {
+		if v.Number > id {
+			id = v.Number
 		}
+
+		return nil
+	})
+	if err != nil {
+		return nil, err
 	}
 
 	id++
@@ -122,9 +159,31 @@ func Create(conf *config.Config, title string) (*Adr, error) {
 	}
 	defer f.Close()
 
-	tmpl.Execute(f, adr)
+	if err := tmpl.Execute(f, adr); err != nil {
+		return nil, err
+	}
 
 	return &adr, nil
+}
+
+func Index(conf *config.Config, body string) error {
+	tmpl, err := template.New("t1").Parse(body)
+	if err != nil {
+		return err
+	}
+
+	list, err := List(conf)
+	if err != nil {
+		return err
+	}
+
+	f, err := os.Create(filepath.Join(conf.Project, conf.Root, "README.md"))
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	return tmpl.Execute(f, list)
 }
 
 func Update(conf *config.Config, adr *Adr) error {

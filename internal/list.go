@@ -15,11 +15,6 @@ func List() error {
 		return err
 	}
 
-	list, err := adr.Index(conf)
-	if err != nil {
-		return err
-	}
-
 	t := table.NewWriter()
 
 	t.SetOutputMirror(os.Stdout)
@@ -27,13 +22,18 @@ func List() error {
 	t.SortBy([]table.SortBy{{Name: "#", Mode: table.AscNumeric}})
 	t.AppendHeader(table.Row{"#", "date", "status", "title"})
 
-	for _, v := range list {
+	err = adr.ForEach(conf, func(v *adr.Adr) error {
 		t.AppendRow(table.Row{
 			fmt.Sprintf("%04d", v.Number),
 			v.Date,
 			v.Status,
 			v.Title,
 		})
+
+		return nil
+	})
+	if err != nil {
+		return err
 	}
 
 	t.Render()

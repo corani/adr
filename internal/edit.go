@@ -1,7 +1,6 @@
 package internal
 
 import (
-	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -16,21 +15,19 @@ func Edit(id int) error {
 		return err
 	}
 
-	list, err := adr.Index(conf)
+	found, err := adr.ById(conf, adr.Number(id))
 	if err != nil {
 		return err
 	}
 
-	for _, v := range list {
-		if v.Number == adr.Number(id) {
-			cmd := exec.Command(os.Getenv("EDITOR"), filepath.Join(conf.Project, conf.Root, v.Filename))
-			cmd.Stdin = os.Stdin
-			cmd.Stdout = os.Stdout
-			cmd.Stderr = os.Stderr
+	cmd := exec.Command(os.Getenv("EDITOR"), filepath.Join(conf.Project, conf.Root, found.Filename))
+	cmd.Stdin = os.Stdin
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
 
-			return cmd.Run()
-		}
+	if err := cmd.Run(); err != nil {
+		return err
 	}
 
-	return fmt.Errorf("file not found")
+	return Index()
 }

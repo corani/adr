@@ -5,15 +5,16 @@ import (
 	"github.com/corani/adr/internal/config"
 )
 
-func Create(title string) error {
+func Index() error {
 	conf, err := config.ReadConfig()
 	if err != nil {
 		return err
 	}
 
-	if v, err := adr.Create(conf, title); err != nil {
+	body, err := template.ReadFile("template/index.md")
+	if err != nil {
 		return err
-	} else {
-		return Edit(int(v.Number))
 	}
+
+	return adr.Index(conf, string(body))
 }
