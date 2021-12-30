@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -20,6 +21,8 @@ func Edit(id int) error {
 		return err
 	}
 
+	log.Printf("editing ADR: %v", filepath.Join(conf.Root, found.Filename))
+
 	cmd := exec.Command(os.Getenv("EDITOR"), filepath.Join(conf.Project, conf.Root, found.Filename))
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
@@ -29,5 +32,5 @@ func Edit(id int) error {
 		return err
 	}
 
-	return Index()
+	return adr.Index(conf)
 }

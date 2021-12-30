@@ -9,9 +9,10 @@ import (
 )
 
 type Config struct {
-	Project  string `yaml:"-"`
-	Root     string `yaml:"root"`
-	Template string `yaml:"template"`
+	Project       string `yaml:"-"`
+	Root          string `yaml:"root"`
+	AdrTemplate   string `yaml:"adrTemplate"`
+	IndexTemplate string `yaml:"indexTemplate"`
 }
 
 func ProjectRoot() (string, error) {

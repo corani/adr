@@ -9,8 +9,8 @@ import (
 //go:embed template
 var template embed.FS
 
-func writeTemplate(target string) error {
-	body, err := template.ReadFile("template/template.md")
+func writeTemplate(source, target string) error {
+	body, err := template.ReadFile(source)
 	if err != nil {
 		return fmt.Errorf("ReadFile: %w", err)
 	}

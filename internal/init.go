@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/corani/adr/internal/adr"
 	"github.com/corani/adr/internal/config"
 )
 
@@ -15,8 +16,9 @@ func Init(path string) error {
 	}
 
 	conf := &config.Config{
-		Root:     path,
-		Template: filepath.Join(path, "template.md"),
+		Root:          path,
+		AdrTemplate:   filepath.Join(path, "adr-template.md"),
+		IndexTemplate: filepath.Join(path, "index-template.md"),
 	}
 
 	log.Printf("[CMD] mkdir -p %q", path)
@@ -31,11 +33,21 @@ func Init(path string) error {
 		return err
 	}
 
-	log.Printf("create %q", conf.Template)
+	log.Printf("create %q", conf.AdrTemplate)
 
-	if err := writeTemplate(filepath.Join(root, conf.Template)); err != nil {
+	if err := writeTemplate(
+		"template/template.md", filepath.Join(root, conf.AdrTemplate),
+	); err != nil {
 		return err
 	}
 
-	return nil
+	log.Printf("create %q", conf.IndexTemplate)
+
+	if err := writeTemplate(
+		"template/index.md", filepath.Join(root, conf.IndexTemplate),
+	); err != nil {
+		return err
+	}
+
+	return adr.Index(conf)
 }
