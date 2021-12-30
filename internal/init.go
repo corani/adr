@@ -4,25 +4,36 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+
+	"github.com/corani/adr/internal/config"
 )
 
 func Init(path string) error {
-	root, err := ProjectRoot()
+	root, err := config.ProjectRoot()
 	if err != nil {
 		return err
 	}
 
-	path = filepath.Join(root, path)
+	conf := &config.Config{
+		Root:     path,
+		Template: filepath.Join(path, "template.md"),
+	}
 
 	log.Printf("[CMD] mkdir -p %q", path)
 
-	if err := os.MkdirAll(path, 0755); err != nil {
+	if err := os.MkdirAll(filepath.Join(root, path), 0755); err != nil {
 		return err
 	}
 
-	log.Println("create `template.md`")
+	log.Printf(`create ".adr.yaml"`)
 
-	if err := initTemplate(filepath.Join(path, "template.md")); err != nil {
+	if err := config.WriteConfig(root, conf); err != nil {
+		return err
+	}
+
+	log.Printf("create %q", conf.Template)
+
+	if err := initTemplate(filepath.Join(root, conf.Template)); err != nil {
 		return err
 	}
 

@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/corani/adr/internal/adr"
+	"github.com/corani/adr/internal/config"
 )
 
 func Update(id int, status string) error {
@@ -14,12 +15,12 @@ func Update(id int, status string) error {
 		return fmt.Errorf("invalid status: %v", status)
 	}
 
-	root, err := AdrRoot()
+	conf, err := config.ReadConfig()
 	if err != nil {
 		return err
 	}
 
-	list, err := adr.Index(root)
+	list, err := adr.Index(conf)
 	if err != nil {
 		return err
 	}
@@ -28,7 +29,7 @@ func Update(id int, status string) error {
 		if v.Number == adr.Number(id) {
 			v.Status = adr.Status(status)
 
-			return adr.Update(root, v)
+			return adr.Update(conf, v)
 		}
 	}
 
