@@ -20,18 +20,16 @@ func Update(id int, status string) error {
 		return err
 	}
 
-	list, err := adr.Index(conf)
+	found, err := adr.ById(conf, adr.Number(id))
 	if err != nil {
 		return err
 	}
 
-	for _, v := range list {
-		if v.Number == adr.Number(id) {
-			v.Status = adr.Status(status)
+	found.Status = adr.Status(status)
 
-			return adr.Update(conf, v)
-		}
+	if err := adr.Update(conf, found); err != nil {
+		return err
 	}
 
-	return fmt.Errorf("file not found")
+	return Index()
 }
