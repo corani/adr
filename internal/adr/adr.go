@@ -148,7 +148,9 @@ func Create(conf *config.Config, title string) (*Adr, error) {
 		Link:     0,
 	}
 
-	tmpl, err := template.ParseFiles(filepath.Join(conf.Project, conf.Template))
+	log.Printf("creating ADR: %v", filepath.Join(conf.Root, adr.Filename))
+
+	tmpl, err := template.ParseFiles(filepath.Join(conf.Project, conf.AdrTemplate))
 	if err != nil {
 		return nil, err
 	}
@@ -166,13 +168,15 @@ func Create(conf *config.Config, title string) (*Adr, error) {
 	return &adr, nil
 }
 
-func Index(conf *config.Config, body string) error {
-	tmpl, err := template.New("t1").Parse(body)
+func Index(conf *config.Config) error {
+	log.Printf("updating index: %v", filepath.Join(conf.Root, "README.md"))
+
+	list, err := List(conf)
 	if err != nil {
 		return err
 	}
 
-	list, err := List(conf)
+	tmpl, err := template.ParseFiles(filepath.Join(conf.Project, conf.IndexTemplate))
 	if err != nil {
 		return err
 	}
@@ -187,6 +191,8 @@ func Index(conf *config.Config, body string) error {
 }
 
 func Update(conf *config.Config, adr *Adr) error {
+	log.Printf("updating ADR: %v", filepath.Join(conf.Root, adr.Filename))
+
 	front, err := yaml.Marshal(adr)
 	if err != nil {
 		return err

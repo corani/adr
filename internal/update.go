@@ -31,5 +31,5 @@ func Update(id int, status string) error {
 		return err
 	}
 
-	return Index()
+	return adr.Index(conf)
 }
