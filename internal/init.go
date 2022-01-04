@@ -19,10 +19,12 @@ func Init(path string) error {
 		Root:          path,
 		AdrTemplate:   filepath.Join(path, "adr-template.md"),
 		IndexTemplate: filepath.Join(path, "index-template.md"),
+		Project:       "",
 	}
 
 	log.Printf("[CMD] mkdir -p %q", path)
 
+	//nolint:gomnd,gofumpt
 	if err := os.MkdirAll(filepath.Join(root, path), 0755); err != nil {
 		return err
 	}

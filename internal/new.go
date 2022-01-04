@@ -11,9 +11,10 @@ func Create(title string) error {
 		return err
 	}
 
-	if v, err := adr.Create(conf, title); err != nil {
+	v, err := adr.Create(conf, title)
+	if err != nil {
 		return err
-	} else {
-		return Edit(int(v.Number))
 	}
+
+	return Edit(int(v.Number))
 }

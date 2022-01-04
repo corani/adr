@@ -8,7 +8,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// newCmd represents the new command
+// newCmd represents the new command.
+//nolint:exhaustivestruct,gochecknoglobals
 var newCmd = &cobra.Command{
 	Use:     "new [title]",
 	Aliases: []string{"add", "create"},
@@ -22,6 +23,7 @@ var newCmd = &cobra.Command{
 	},
 }
 
+//nolint:gochecknoinits
 func init() {
 	rootCmd.AddCommand(newCmd)
 }

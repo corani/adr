@@ -7,7 +7,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// listCmd represents the list command
+// listCmd represents the list command.
+//nolint:exhaustivestruct,gochecknoglobals
 var listCmd = &cobra.Command{
 	Use:   "list",
 	Short: "list all ADRs with their id, date and status",
@@ -18,6 +19,7 @@ var listCmd = &cobra.Command{
 	},
 }
 
+//nolint:gochecknoinits
 func init() {
 	rootCmd.AddCommand(listCmd)
 }

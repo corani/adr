@@ -22,6 +22,7 @@ func ProjectRoot() (string, error) {
 	}
 
 	path := cwd
+
 	for {
 		if exists(filepath.Join(path, ".adr.yaml")) {
 			return path, nil
@@ -50,15 +51,15 @@ func ReadConfig() (*Config, error) {
 	path := filepath.Join(root, ".adr.yaml")
 
 	if exists(path) {
-		f, err := os.Open(path)
+		out, err := os.Open(path)
 		if err != nil {
 			return nil, err
 		}
-		defer f.Close()
+		defer out.Close()
 
 		var config Config
 
-		if err := yaml.NewDecoder(f).Decode(&config); err != nil {
+		if err := yaml.NewDecoder(out).Decode(&config); err != nil {
 			return nil, err
 		}
 
@@ -71,13 +72,13 @@ func ReadConfig() (*Config, error) {
 }
 
 func WriteConfig(root string, config *Config) error {
-	f, err := os.Create(filepath.Join(root, ".adr.yaml"))
+	out, err := os.Create(filepath.Join(root, ".adr.yaml"))
 	if err != nil {
 		return err
 	}
-	defer f.Close()
+	defer out.Close()
 
-	return yaml.NewEncoder(f).Encode(config)
+	return yaml.NewEncoder(out).Encode(config)
 }
 
 func exists(path string) bool {
