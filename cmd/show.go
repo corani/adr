@@ -10,9 +10,10 @@ import (
 
 // showCmd represents the show command
 var showCmd = &cobra.Command{
-	Use:   "show <id>",
-	Short: "show the adr with number <id>",
-	Args:  cobra.ExactArgs(1),
+	Use:     "show <id>",
+	Aliases: []string{"view"},
+	Short:   "show the adr with number <id>",
+	Args:    cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		id, err := strconv.Atoi(args[0])
 		if err != nil {

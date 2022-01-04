@@ -10,8 +10,9 @@ import (
 
 // newCmd represents the new command
 var newCmd = &cobra.Command{
-	Use:   "new [title]",
-	Short: "create a new ADR with optional title",
+	Use:     "new [title]",
+	Aliases: []string{"add", "create"},
+	Short:   "create a new ADR with optional title",
 	Run: func(cmd *cobra.Command, args []string) {
 		title := strings.Join(args, " ")
 
