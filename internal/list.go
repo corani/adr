@@ -15,15 +15,15 @@ func List() error {
 		return err
 	}
 
-	t := table.NewWriter()
+	tbl := table.NewWriter()
 
-	t.SetOutputMirror(os.Stdout)
-	t.SetStyle(table.StyleRounded)
-	t.SortBy([]table.SortBy{{Name: "#", Mode: table.AscNumeric}})
-	t.AppendHeader(table.Row{"#", "date", "status", "title"})
+	tbl.SetOutputMirror(os.Stdout)
+	tbl.SetStyle(table.StyleRounded)
+	tbl.SortBy([]table.SortBy{{Name: "#", Mode: table.AscNumeric}})
+	tbl.AppendHeader(table.Row{"#", "date", "status", "title"})
 
 	err = adr.ForEach(conf, func(v *adr.Adr) error {
-		t.AppendRow(table.Row{
+		tbl.AppendRow(table.Row{
 			fmt.Sprintf("%04d", v.Number),
 			v.Date,
 			v.Status,
@@ -36,7 +36,7 @@ func List() error {
 		return err
 	}
 
-	t.Render()
+	tbl.Render()
 
 	return nil
 }

@@ -1,18 +1,21 @@
 package internal
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/corani/adr/internal/adr"
 	"github.com/corani/adr/internal/config"
 )
 
-func Update(id int, status string) error {
+var ErrInvalidStatus = errors.New("invalid status")
+
+func Update(number int, status string) error {
 	switch adr.Status(status) {
 	case adr.StatusProposed, adr.StatusAccepted, adr.StatusDeprecated, adr.StatusSuperseded:
 		// ok
 	default:
-		return fmt.Errorf("invalid status: %v", status)
+		return fmt.Errorf("%w: %v", ErrInvalidStatus, status)
 	}
 
 	conf, err := config.ReadConfig()
@@ -20,7 +23,7 @@ func Update(id int, status string) error {
 		return err
 	}
 
-	found, err := adr.ById(conf, adr.Number(id))
+	found, err := adr.ByID(conf, adr.Number(number))
 	if err != nil {
 		return err
 	}

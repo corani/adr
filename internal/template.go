@@ -15,5 +15,6 @@ func writeTemplate(source, target string) error {
 		return fmt.Errorf("ReadFile: %w", err)
 	}
 
+	//nolint: gosec,gomnd,gofumpt
 	return os.WriteFile(target, body, 0644)
 }

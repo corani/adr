@@ -8,7 +8,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// versionCmd represents the version command
+// versionCmd represents the version command.
+//nolint:exhaustivestruct,gochecknoglobals
 var versionCmd = &cobra.Command{
 	Use:   "version",
 	Short: "show the version information",
@@ -19,6 +20,7 @@ var versionCmd = &cobra.Command{
 	},
 }
 
+//nolint:gochecknoinits
 func init() {
 	rootCmd.AddCommand(versionCmd)
 }

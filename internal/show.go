@@ -10,31 +10,36 @@ import (
 	"github.com/jedib0t/go-pretty/v6/table"
 )
 
-func Show(id int) error {
+func Show(number int) error {
 	conf, err := config.ReadConfig()
 	if err != nil {
 		return err
 	}
 
-	found, err := adr.ById(conf, adr.Number(id))
+	found, err := adr.ByID(conf, adr.Number(number))
 	if err != nil {
 		return err
 	}
 
-	t := table.NewWriter()
+	tbl := table.NewWriter()
 
-	t.SetOutputMirror(os.Stdout)
-	t.SetStyle(table.StyleRounded)
-	t.AppendRows([]table.Row{
+	tbl.SetOutputMirror(os.Stdout)
+	tbl.SetStyle(table.StyleRounded)
+	tbl.AppendRows([]table.Row{
 		{"Filename", found.Filename},
 		{"Number", fmt.Sprintf("%04d", found.Number)},
 		{"Date", found.Date},
 		{"Status", found.Status},
 	})
 
-	t.Render()
+	tbl.Render()
 
-	out := markdown.Render(string(found.Body), 80, 1)
+	const (
+		width  = 80
+		indent = 1
+	)
+
+	out := markdown.Render(string(found.Body), width, indent)
 
 	fmt.Println()
 	fmt.Println(string(out))

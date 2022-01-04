@@ -9,11 +9,12 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// updateCmd represents the update command
+// updateCmd represents the update command.
+//nolint:exhaustivestruct,gochecknoglobals
 var updateCmd = &cobra.Command{
 	Use:   "update <id> <status>",
 	Short: "update the adr with number <id> to status <status>",
-	Args:  cobra.ExactArgs(2),
+	Args:  cobra.ExactArgs(2), //nolint:gomnd
 	Run: func(cmd *cobra.Command, args []string) {
 		id, err := strconv.Atoi(args[0])
 		if err != nil {
@@ -30,6 +31,7 @@ var updateCmd = &cobra.Command{
 	},
 }
 
+//nolint:gochecknoinits
 func init() {
 	rootCmd.AddCommand(updateCmd)
 }

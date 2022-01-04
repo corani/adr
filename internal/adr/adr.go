@@ -42,14 +42,14 @@ type Adrs map[Number]*Adr
 
 var ErrForEachStop = errors.New("stop iterating")
 
-func ForEach(conf *config.Config, fn func(*Adr) error) error {
+func ForEach(conf *config.Config, callback func(*Adr) error) error {
 	list, err := List(conf)
 	if err != nil {
 		return err
 	}
 
 	for _, adr := range list {
-		if err := fn(adr); err != nil {
+		if err := callback(adr); err != nil {
 			if errors.Is(err, ErrForEachStop) {
 				break
 			}
@@ -61,14 +61,14 @@ func ForEach(conf *config.Config, fn func(*Adr) error) error {
 	return nil
 }
 
-func ById(conf *config.Config, id Number) (*Adr, error) {
+func ByID(conf *config.Config, number Number) (*Adr, error) {
 	list, err := List(conf)
 	if err != nil {
 		return nil, err
 	}
 
 	for _, v := range list {
-		if v.Number == id {
+		if v.Number == number {
 			return v, nil
 		}
 	}
@@ -77,15 +77,15 @@ func ById(conf *config.Config, id Number) (*Adr, error) {
 }
 
 func Parse(path string) (*Adr, error) {
-	f, err := os.Open(path)
+	adrFile, err := os.Open(path)
 	if err != nil {
 		return nil, err
 	}
-	defer f.Close()
+	defer adrFile.Close()
 
 	var adr Adr
 
-	body, err := frontmatter.Parse(f, &adr)
+	body, err := frontmatter.Parse(adrFile, &adr)
 	if err != nil {
 		return nil, err
 	}
@@ -106,12 +106,14 @@ func List(conf *config.Config) (Adrs, error) {
 
 	list := Adrs{}
 
+	check := regexp.MustCompile(`[0-9]+\-.*?\.md`)
+
 	for _, file := range files {
 		if file.IsDir() {
 			continue
 		}
 
-		if ok, _ := regexp.MatchString(`[0-9]+\-.*?\.md`, file.Name()); ok {
+		if ok := check.MatchString(file.Name()); ok {
 			if v, err := Parse(filepath.Join(root, file.Name())); err == nil {
 				list[v.Number] = v
 			} else {
@@ -146,6 +148,8 @@ func Create(conf *config.Config, title string) (*Adr, error) {
 		Status:   StatusProposed,
 		Date:     time.Now().Format("2006-01-02"),
 		Link:     0,
+		Type:     "",
+		Body:     nil,
 	}
 
 	log.Printf("creating ADR: %v", filepath.Join(conf.Root, adr.Filename))
@@ -155,13 +159,13 @@ func Create(conf *config.Config, title string) (*Adr, error) {
 		return nil, err
 	}
 
-	f, err := os.Create(filepath.Join(conf.Project, conf.Root, adr.Filename))
+	out, err := os.Create(filepath.Join(conf.Project, conf.Root, adr.Filename))
 	if err != nil {
 		return nil, err
 	}
-	defer f.Close()
+	defer out.Close()
 
-	if err := tmpl.Execute(f, adr); err != nil {
+	if err := tmpl.Execute(out, adr); err != nil {
 		return nil, err
 	}
 
@@ -181,13 +185,13 @@ func Index(conf *config.Config) error {
 		return err
 	}
 
-	f, err := os.Create(filepath.Join(conf.Project, conf.Root, "README.md"))
+	out, err := os.Create(filepath.Join(conf.Project, conf.Root, "README.md"))
 	if err != nil {
 		return err
 	}
-	defer f.Close()
+	defer out.Close()
 
-	return tmpl.Execute(f, list)
+	return tmpl.Execute(out, list)
 }
 
 func Update(conf *config.Config, adr *Adr) error {
@@ -198,16 +202,19 @@ func Update(conf *config.Config, adr *Adr) error {
 		return err
 	}
 
-	f, err := os.Create(filepath.Join(conf.Project, conf.Root, adr.Filename))
+	out, err := os.Create(filepath.Join(conf.Project, conf.Root, adr.Filename))
 	if err != nil {
 		return err
 	}
-	defer f.Close()
+	defer out.Close()
 
-	f.WriteString("---\n")
-	f.Write(front)
-	f.WriteString("---\n")
-	f.Write(adr.Body)
+	//nolint:errcheck
+	{
+		out.WriteString("---\n")
+		out.Write(front)
+		out.WriteString("---\n")
+		out.Write(adr.Body)
+	}
 
 	return nil
 }

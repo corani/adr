@@ -26,6 +26,7 @@ import (
 	"github.com/corani/adr/internal/config"
 )
 
+//nolint:gochecknoglobals
 var (
 	version = "dev"
 	commit  = "none"

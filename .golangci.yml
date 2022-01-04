@@ -1,0 +1,9 @@
+run:
+  skip-files:
+    - vendor/
+
+linters:
+  enable-all: true
+  disable:
+    - testpackage
+    - forbidigo

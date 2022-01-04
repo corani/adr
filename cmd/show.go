@@ -8,7 +8,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// showCmd represents the show command
+// showCmd represents the show command.
+//nolint:exhaustivestruct,gochecknoglobals
 var showCmd = &cobra.Command{
 	Use:     "show <id>",
 	Aliases: []string{"view"},
@@ -28,6 +29,7 @@ var showCmd = &cobra.Command{
 	},
 }
 
+//nolint:gochecknoinits
 func init() {
 	rootCmd.AddCommand(showCmd)
 }

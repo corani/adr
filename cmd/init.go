@@ -7,7 +7,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// initCmd represents the init command
+// initCmd represents the init command.
+//nolint:exhaustivestruct,gochecknoglobals
 var initCmd = &cobra.Command{
 	Use:   "init [path]",
 	Short: "initialize the adr path (default is `docs/adr`)",
@@ -27,6 +28,7 @@ var initCmd = &cobra.Command{
 	},
 }
 
+//nolint:gochecknoinits
 func init() {
 	rootCmd.AddCommand(initCmd)
 }

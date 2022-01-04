@@ -8,7 +8,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// editCmd represents the edit command
+// editCmd represents the edit command.
+//nolint:exhaustivestruct,gochecknoglobals
 var editCmd = &cobra.Command{
 	Use:   "edit <id>",
 	Short: "open the adr with number <id> in the default editor",
@@ -26,6 +27,7 @@ var editCmd = &cobra.Command{
 	},
 }
 
+//nolint:gochecknoinits
 func init() {
 	rootCmd.AddCommand(editCmd)
 }
