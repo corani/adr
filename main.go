@@ -21,8 +21,20 @@ THE SOFTWARE.
 */
 package main
 
-import "github.com/corani/adr/cmd"
+import (
+	"github.com/corani/adr/cmd"
+	"github.com/corani/adr/internal/config"
+)
+
+var (
+	version = "dev"
+	commit  = "none"
+	date    = "unknown"
+	builtBy = "unknown"
+)
 
 func main() {
+	config.SetVersion(version, commit, date, builtBy)
+
 	cmd.Execute()
 }
