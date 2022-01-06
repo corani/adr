@@ -13,12 +13,12 @@ import (
 func Show(number int) error {
 	conf, err := config.ReadConfig()
 	if err != nil {
-		return err
+		return fmt.Errorf("%w: show: %v", ErrInternal, err)
 	}
 
 	found, err := adr.ByID(conf, adr.Number(number))
 	if err != nil {
-		return err
+		return fmt.Errorf("%w: show: %v", ErrInternal, err)
 	}
 
 	tbl := table.NewWriter()

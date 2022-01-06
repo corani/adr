@@ -20,5 +20,4 @@ func GetVersion() Version {
 	return version
 }
 
-//nolint:gochecknoglobals
 var version Version

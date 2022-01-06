@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"os/exec"
@@ -13,12 +14,12 @@ import (
 func Edit(number int) error {
 	conf, err := config.ReadConfig()
 	if err != nil {
-		return err
+		return fmt.Errorf("%w: edit: %v", ErrInternal, err)
 	}
 
 	found, err := adr.ByID(conf, adr.Number(number))
 	if err != nil {
-		return err
+		return fmt.Errorf("%w: edit: %v", ErrInternal, err)
 	}
 
 	log.Printf("editing ADR: %v", filepath.Join(conf.Root, found.Filename))
@@ -30,8 +31,12 @@ func Edit(number int) error {
 	cmd.Stderr = os.Stderr
 
 	if err := cmd.Run(); err != nil {
-		return err
+		return fmt.Errorf("%w: edit: %v", ErrInternal, err)
 	}
 
-	return adr.Index(conf)
+	if err := adr.Index(conf); err != nil {
+		return fmt.Errorf("%w: edit: %v", ErrInternal, err)
+	}
+
+	return nil
 }

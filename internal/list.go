@@ -12,7 +12,7 @@ import (
 func List() error {
 	conf, err := config.ReadConfig()
 	if err != nil {
-		return err
+		return fmt.Errorf("%w: list: %v", ErrInternal, err)
 	}
 
 	tbl := table.NewWriter()
@@ -33,7 +33,7 @@ func List() error {
 		return nil
 	})
 	if err != nil {
-		return err
+		return fmt.Errorf("%w: list: %v", ErrInternal, err)
 	}
 
 	tbl.Render()

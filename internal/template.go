@@ -12,9 +12,13 @@ var template embed.FS
 func writeTemplate(source, target string) error {
 	body, err := template.ReadFile(source)
 	if err != nil {
-		return fmt.Errorf("ReadFile: %w", err)
+		return fmt.Errorf("%w: writeTemplate: %v", ErrInternal, err)
 	}
 
 	//nolint: gosec,gomnd,gofumpt
-	return os.WriteFile(target, body, 0644)
+	if err := os.WriteFile(target, body, 0644); err != nil {
+		return fmt.Errorf("%w: writeTemplate: %v", ErrInternal, err)
+	}
+
+	return nil
 }

@@ -79,7 +79,7 @@ func ByID(conf *config.Config, number Number) (*Adr, error) {
 func Parse(path string) (*Adr, error) {
 	adrFile, err := os.Open(path)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("%w: parse: %v", ErrAdr, err)
 	}
 	defer adrFile.Close()
 
@@ -87,7 +87,7 @@ func Parse(path string) (*Adr, error) {
 
 	body, err := frontmatter.Parse(adrFile, &adr)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("%w: parse: %v", ErrAdr, err)
 	}
 
 	adr.Filename = filepath.Base(path)
@@ -101,7 +101,7 @@ func List(conf *config.Config) (Adrs, error) {
 
 	files, err := os.ReadDir(root)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("%w: list: %v", ErrAdr, err)
 	}
 
 	list := Adrs{}
@@ -156,17 +156,17 @@ func Create(conf *config.Config, title string) (*Adr, error) {
 
 	tmpl, err := template.ParseFiles(filepath.Join(conf.Project, conf.AdrTemplate))
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("%w: create: %v", ErrAdr, err)
 	}
 
 	out, err := os.Create(filepath.Join(conf.Project, conf.Root, adr.Filename))
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("%w: create: %v", ErrAdr, err)
 	}
 	defer out.Close()
 
 	if err := tmpl.Execute(out, adr); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("%w: create: %v", ErrAdr, err)
 	}
 
 	return &adr, nil
@@ -182,16 +182,20 @@ func Index(conf *config.Config) error {
 
 	tmpl, err := template.ParseFiles(filepath.Join(conf.Project, conf.IndexTemplate))
 	if err != nil {
-		return err
+		return fmt.Errorf("%w: index: %v", ErrAdr, err)
 	}
 
 	out, err := os.Create(filepath.Join(conf.Project, conf.Root, "README.md"))
 	if err != nil {
-		return err
+		return fmt.Errorf("%w: index: %v", ErrAdr, err)
 	}
 	defer out.Close()
 
-	return tmpl.Execute(out, list)
+	if err := tmpl.Execute(out, list); err != nil {
+		return fmt.Errorf("%w: index: %v", ErrAdr, err)
+	}
+
+	return nil
 }
 
 func Update(conf *config.Config, adr *Adr) error {
@@ -199,12 +203,12 @@ func Update(conf *config.Config, adr *Adr) error {
 
 	front, err := yaml.Marshal(adr)
 	if err != nil {
-		return err
+		return fmt.Errorf("%w: update: %v", ErrAdr, err)
 	}
 
 	out, err := os.Create(filepath.Join(conf.Project, conf.Root, adr.Filename))
 	if err != nil {
-		return err
+		return fmt.Errorf("%w: update: %v", ErrAdr, err)
 	}
 	defer out.Close()
 
