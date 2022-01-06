@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"path/filepath"
@@ -12,7 +13,7 @@ import (
 func Init(path string) error {
 	root, err := config.ProjectRoot()
 	if err != nil {
-		return err
+		return fmt.Errorf("%w: init: %v", ErrInternal, err)
 	}
 
 	conf := &config.Config{
@@ -26,13 +27,13 @@ func Init(path string) error {
 
 	//nolint:gomnd,gofumpt
 	if err := os.MkdirAll(filepath.Join(root, path), 0755); err != nil {
-		return err
+		return fmt.Errorf("%w: init: %v", ErrInternal, err)
 	}
 
 	log.Printf(`create ".adr.yaml"`)
 
 	if err := config.WriteConfig(root, conf); err != nil {
-		return err
+		return fmt.Errorf("%w: init: %v", ErrInternal, err)
 	}
 
 	log.Printf("create %q", conf.AdrTemplate)
@@ -51,5 +52,9 @@ func Init(path string) error {
 		return err
 	}
 
-	return adr.Index(conf)
+	if err := adr.Index(conf); err != nil {
+		return fmt.Errorf("%w: init: %v", ErrInternal, err)
+	}
+
+	return nil
 }

@@ -2,6 +2,7 @@ package config
 
 import (
 	"errors"
+	"fmt"
 	"os"
 	"path/filepath"
 
@@ -18,7 +19,7 @@ type Config struct {
 func ProjectRoot() (string, error) {
 	cwd, err := os.Getwd()
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("%w: get root: %v", ErrConfig, err)
 	}
 
 	path := cwd
@@ -53,14 +54,14 @@ func ReadConfig() (*Config, error) {
 	if exists(path) {
 		out, err := os.Open(path)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("%w: read: %v", ErrConfig, err)
 		}
 		defer out.Close()
 
 		var config Config
 
 		if err := yaml.NewDecoder(out).Decode(&config); err != nil {
-			return nil, err
+			return nil, fmt.Errorf("%w: read: %v", ErrConfig, err)
 		}
 
 		config.Project = root
@@ -74,11 +75,15 @@ func ReadConfig() (*Config, error) {
 func WriteConfig(root string, config *Config) error {
 	out, err := os.Create(filepath.Join(root, ".adr.yaml"))
 	if err != nil {
-		return err
+		return fmt.Errorf("%w: write: %v", ErrConfig, err)
 	}
 	defer out.Close()
 
-	return yaml.NewEncoder(out).Encode(config)
+	if err := yaml.NewEncoder(out).Encode(config); err != nil {
+		return fmt.Errorf("%w: write: %v", ErrConfig, err)
+	}
+
+	return nil
 }
 
 func exists(path string) bool {
