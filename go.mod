@@ -8,7 +8,7 @@ require (
 	github.com/gosimple/slug v1.13.1
 	github.com/jedib0t/go-pretty/v6 v6.4.4
 	github.com/spf13/cobra v1.6.1
-	gopkg.in/yaml.v2 v2.4.0
+	gopkg.in/yaml.v3 v3.0.1
 )
 
 require (
@@ -36,4 +36,5 @@ require (
 	golang.org/x/net v0.0.0-20190813141303-74dc4d7220e7 // indirect
 	golang.org/x/sys v0.0.0-20191026070338-33540a1f6037 // indirect
 	gopkg.in/check.v1 v1.0.0-20200227125254-8fa46927fb4f // indirect
+	gopkg.in/yaml.v2 v2.3.0 // indirect
 )

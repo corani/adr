@@ -13,7 +13,7 @@ import (
 	"github.com/adrg/frontmatter"
 	"github.com/corani/adr/internal/config"
 	"github.com/gosimple/slug"
-	"gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v3"
 )
 
 type Status string
