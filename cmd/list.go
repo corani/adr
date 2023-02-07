@@ -8,11 +8,12 @@ import (
 )
 
 // listCmd represents the list command.
-//nolint:exhaustivestruct,gochecknoglobals
+//
+//nolint:exhaustruct,gochecknoglobals
 var listCmd = &cobra.Command{
 	Use:   "list",
 	Short: "list all ADRs with their id, date and status",
-	Run: func(cmd *cobra.Command, args []string) {
+	Run: func(_ *cobra.Command, _ []string) {
 		if err := internal.List(); err != nil {
 			log.Printf("couldn't list adrs: %v", err)
 		}

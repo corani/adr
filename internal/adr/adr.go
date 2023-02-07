@@ -126,7 +126,7 @@ func List(conf *config.Config) (Adrs, error) {
 }
 
 func Create(conf *config.Config, title string) (*Adr, error) {
-	var id Number
+	var id Number //nolint:varnamelen
 
 	err := ForEach(conf, func(v *Adr) error {
 		if v.Number > id {

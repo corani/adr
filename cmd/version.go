@@ -9,11 +9,12 @@ import (
 )
 
 // versionCmd represents the version command.
-//nolint:exhaustivestruct,gochecknoglobals
+//
+//nolint:exhaustruct,gochecknoglobals
 var versionCmd = &cobra.Command{
 	Use:   "version",
 	Short: "show the version information",
-	Run: func(cmd *cobra.Command, args []string) {
+	Run: func(_ *cobra.Command, _ []string) {
 		if err := internal.Version(os.Args[0]); err != nil {
 			log.Printf("couldn't show version: %v", err)
 		}

@@ -9,12 +9,13 @@ import (
 )
 
 // newCmd represents the new command.
-//nolint:exhaustivestruct,gochecknoglobals
+//
+//nolint:exhaustruct,gochecknoglobals
 var newCmd = &cobra.Command{
 	Use:     "new [title]",
 	Aliases: []string{"add", "create"},
 	Short:   "create a new ADR with optional title",
-	Run: func(cmd *cobra.Command, args []string) {
+	Run: func(_ *cobra.Command, args []string) {
 		title := strings.Join(args, " ")
 
 		if err := internal.Create(title); err != nil {
