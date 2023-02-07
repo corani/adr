@@ -58,7 +58,7 @@ github.com/gomarkdown/markdown
 github.com/gomarkdown/markdown/ast
 github.com/gomarkdown/markdown/html
 github.com/gomarkdown/markdown/parser
-# github.com/gosimple/slug v1.12.0
+# github.com/gosimple/slug v1.13.1
 ## explicit
 github.com/gosimple/slug
 # github.com/gosimple/unidecode v1.0.1
