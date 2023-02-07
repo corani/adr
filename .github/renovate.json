@@ -1,0 +1,33 @@
+{
+    "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+    "extends": [
+        "config:base"
+    ],
+    "constraints": {
+        "go": "1.19"
+    },
+    "postUpdateOptions": [
+        "gomodTidy1.17"
+    ],
+    "packageRules": [
+        {
+            "matchUpdateTypes": ["patch", "digest"],
+            "labels": ["renovate", "patch-update"],
+            "automerge": true
+        },
+        {
+            "matchUpdateTypes": ["minor"],
+            "labels": ["renovate", "minor-update"],
+            "automerge": true
+        },
+        {
+            "matchUpdateTypes": ["major"],
+            "labels": ["renovate", "major-update"],
+            "dependencyDashboardApproval": true
+        }
+    ],
+    "dependencyDashboardLabels": ["renovate"],
+    "prConcurrentLimit": 4,
+    "automergeType": "pr",
+    "platformAutomerge": true
+}
