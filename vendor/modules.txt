@@ -65,7 +65,7 @@ github.com/gosimple/slug
 github.com/gosimple/unidecode
 # github.com/inconshreveable/mousetrap v1.0.0
 github.com/inconshreveable/mousetrap
-# github.com/jedib0t/go-pretty/v6 v6.2.4
+# github.com/jedib0t/go-pretty/v6 v6.4.4
 ## explicit
 github.com/jedib0t/go-pretty/v6/table
 github.com/jedib0t/go-pretty/v6/text
@@ -80,7 +80,6 @@ github.com/mattn/go-colorable
 # github.com/mattn/go-isatty v0.0.14
 github.com/mattn/go-isatty
 # github.com/mattn/go-runewidth v0.0.13
-## explicit
 github.com/mattn/go-runewidth
 # github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e
 ## explicit
