@@ -9,11 +9,12 @@ import (
 )
 
 // editCmd represents the edit command.
-//nolint:exhaustivestruct,gochecknoglobals
+//
+//nolint:exhaustruct,gochecknoglobals
 var editCmd = &cobra.Command{
 	Use:   "edit <id>",
 	Short: "open the adr with number <id> in the default editor",
-	Run: func(cmd *cobra.Command, args []string) {
+	Run: func(_ *cobra.Command, args []string) {
 		number, err := strconv.Atoi(args[0])
 		if err != nil {
 			log.Printf("invalid argument: %v", err)

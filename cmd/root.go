@@ -7,7 +7,8 @@ import (
 )
 
 // rootCmd represents the base command when called without any subcommands.
-//nolint:exhaustivestruct,gochecknoglobals
+//
+//nolint:exhaustruct,gochecknoglobals
 var rootCmd = &cobra.Command{
 	Use:   "adr",
 	Short: "A command line tool to maintain Architecture Decision Records",

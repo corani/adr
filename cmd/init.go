@@ -8,12 +8,13 @@ import (
 )
 
 // initCmd represents the init command.
-//nolint:exhaustivestruct,gochecknoglobals
+//
+//nolint:exhaustruct,gochecknoglobals
 var initCmd = &cobra.Command{
 	Use:   "init [path]",
 	Short: "initialize the adr path (default is `docs/adr`)",
 	Args:  cobra.MaximumNArgs(1),
-	Run: func(cmd *cobra.Command, args []string) {
+	Run: func(_ *cobra.Command, args []string) {
 		path := "docs/adr"
 
 		if len(args) > 0 {
