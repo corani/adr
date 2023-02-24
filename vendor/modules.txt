@@ -118,12 +118,13 @@ golang.org/x/image/tiff/lzw
 golang.org/x/image/vp8
 golang.org/x/image/vp8l
 golang.org/x/image/webp
-# golang.org/x/net v0.0.0-20190813141303-74dc4d7220e7
-## explicit; go 1.11
+# golang.org/x/net v0.7.0
+## explicit; go 1.17
 golang.org/x/net/html
 golang.org/x/net/html/atom
-# golang.org/x/sys v0.0.0-20191026070338-33540a1f6037
-## explicit; go 1.12
+# golang.org/x/sys v0.5.0
+## explicit; go 1.17
+golang.org/x/sys/internal/unsafeheader
 golang.org/x/sys/unix
 golang.org/x/sys/windows
 # gopkg.in/check.v1 v1.0.0-20200227125254-8fa46927fb4f
