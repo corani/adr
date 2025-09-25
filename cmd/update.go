@@ -15,7 +15,7 @@ import (
 var updateCmd = &cobra.Command{
 	Use:   "update <id> <status>",
 	Short: "update the adr with number <id> to status <status>",
-	Args:  cobra.ExactArgs(2), //nolint:gomnd
+	Args:  cobra.ExactArgs(2), //nolint:mnd
 	Run: func(_ *cobra.Command, args []string) {
 		number, err := strconv.Atoi(args[0])
 		if err != nil {

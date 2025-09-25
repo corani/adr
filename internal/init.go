@@ -13,7 +13,7 @@ import (
 func Init(path string) error {
 	root, err := config.ProjectRoot()
 	if err != nil {
-		return fmt.Errorf("%w: init: %v", ErrInternal, err)
+		return fmt.Errorf("%w: init: %w", ErrInternal, err)
 	}
 
 	conf := &config.Config{
@@ -25,15 +25,15 @@ func Init(path string) error {
 
 	log.Printf("[CMD] mkdir -p %q", path)
 
-	//nolint:gomnd,gofumpt
-	if err := os.MkdirAll(filepath.Join(root, path), 0755); err != nil {
-		return fmt.Errorf("%w: init: %v", ErrInternal, err)
+	//nolint:mnd,gofumpt
+	if err := os.MkdirAll(filepath.Join(root, path), 0750); err != nil {
+		return fmt.Errorf("%w: init: %w", ErrInternal, err)
 	}
 
 	log.Printf(`create ".adr.yaml"`)
 
 	if err := config.WriteConfig(root, conf); err != nil {
-		return fmt.Errorf("%w: init: %v", ErrInternal, err)
+		return fmt.Errorf("%w: init: %w", ErrInternal, err)
 	}
 
 	log.Printf("create %q", conf.AdrTemplate)
@@ -53,7 +53,7 @@ func Init(path string) error {
 	}
 
 	if err := adr.Index(conf); err != nil {
-		return fmt.Errorf("%w: init: %v", ErrInternal, err)
+		return fmt.Errorf("%w: init: %w", ErrInternal, err)
 	}
 
 	return nil

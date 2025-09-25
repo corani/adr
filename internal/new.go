@@ -10,12 +10,12 @@ import (
 func Create(title string) error {
 	conf, err := config.ReadConfig()
 	if err != nil {
-		return fmt.Errorf("%w: create: %v", ErrInternal, err)
+		return fmt.Errorf("%w: create: %w", ErrInternal, err)
 	}
 
 	v, err := adr.Create(conf, title)
 	if err != nil {
-		return fmt.Errorf("%w: create: %v", ErrInternal, err)
+		return fmt.Errorf("%w: create: %w", ErrInternal, err)
 	}
 
 	return Edit(int(v.Number))
