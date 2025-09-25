@@ -20,9 +20,10 @@ func List() error {
 	tbl.SetOutputMirror(os.Stdout)
 	tbl.SetStyle(table.StyleRounded)
 	tbl.SortBy([]table.SortBy{{
-		Name:   "#",
-		Number: 0,
-		Mode:   table.AscNumeric,
+		Name:       "#",
+		Mode:       table.AscNumeric,
+		Number:     0,
+		IgnoreCase: false,
 	}})
 	tbl.AppendHeader(table.Row{"#", "date", "status", "title"})
 

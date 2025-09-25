@@ -228,7 +228,7 @@ func maybeInlineFootnoteOrSuper(p *Parser, data []byte, offset int) (int, ast.No
 		}
 		sup := &ast.Superscript{}
 		sup.Literal = data[offset+1 : offset+ret]
-		return offset + ret, sup
+		return ret + 1, sup
 	}
 
 	return 0, nil
@@ -326,6 +326,7 @@ func link(p *Parser, data []byte, offset int) (int, ast.Node) {
 		i = skipSpace(data, i)
 
 		linkB := i
+		brace := 0
 
 		// look for link end: ' " )
 	findlinkend:
@@ -334,7 +335,18 @@ func link(p *Parser, data []byte, offset int) (int, ast.Node) {
 			case data[i] == '\\':
 				i += 2
 
-			case data[i] == ')' || data[i] == '\'' || data[i] == '"':
+			case data[i] == '(':
+				brace++
+				i++
+
+			case data[i] == ')':
+				if brace <= 0 {
+					break findlinkend
+				}
+				brace--
+				i++
+
+			case data[i] == '\'' || data[i] == '"':
 				break findlinkend
 
 			default:
@@ -352,19 +364,21 @@ func link(p *Parser, data []byte, offset int) (int, ast.Node) {
 		if data[i] == '\'' || data[i] == '"' {
 			i++
 			titleB = i
+			titleEndCharFound := false
 
 		findtitleend:
 			for i < len(data) {
 				switch {
 				case data[i] == '\\':
-					i += 2
-
-				case data[i] == ')':
-					break findtitleend
-
-				default:
 					i++
+
+				case data[i] == data[titleB-1]: // matching title delimiter
+					titleEndCharFound = true
+
+				case titleEndCharFound && data[i] == ')':
+					break findtitleend
 				}
+				i++
 			}
 
 			if i >= len(data) {
@@ -536,6 +550,9 @@ func link(p *Parser, data []byte, offset int) (int, ast.Node) {
 			// if inline footnote, title == footnote contents
 			title = lr.title
 			noteID = lr.noteID
+			if len(lr.text) > 0 {
+				altContent = lr.text
+			}
 		}
 
 		// rewind the whitespace
@@ -686,7 +703,7 @@ func leftAngle(p *Parser, data []byte, offset int) (int, ast.Node) {
 }
 
 // '\\' backslash escape
-var escapeChars = []byte("\\`*_{}[]()#+-.!:|&<>~")
+var escapeChars = []byte("\\`*_{}[]()#+-.!:|&<>~^")
 
 func escape(p *Parser, data []byte, offset int) (int, ast.Node) {
 	data = data[offset:]
@@ -749,7 +766,22 @@ func entity(p *Parser, data []byte, offset int) (int, ast.Node) {
 	// undo &amp; escaping or it will be converted to &amp;amp; by another
 	// escaper in the renderer
 	if bytes.Equal(ent, []byte("&amp;")) {
-		ent = []byte{'&'}
+		return end, newTextNode([]byte{'&'})
+	}
+	if len(ent) < 4 {
+		return end, newTextNode(ent)
+	}
+
+	// if ent consists solely out of numbers (hex or decimal) convert that unicode codepoint to actual rune
+	codepoint := uint64(0)
+	var err error
+	if ent[2] == 'x' || ent[2] == 'X' { // hexadecimal
+		codepoint, err = strconv.ParseUint(string(ent[3:len(ent)-1]), 16, 64)
+	} else {
+		codepoint, err = strconv.ParseUint(string(ent[2:len(ent)-1]), 10, 64)
+	}
+	if err == nil { // only if conversion was valid return here.
+		return end, newTextNode([]byte(string(codepoint)))
 	}
 
 	return end, newTextNode(ent)
@@ -1276,7 +1308,7 @@ func math(p *Parser, data []byte, offset int) (int, ast.Node) {
 }
 
 func newTextNode(d []byte) *ast.Text {
-	return &ast.Text{ast.Leaf{Literal: d}}
+	return &ast.Text{Leaf: ast.Leaf{Literal: d}}
 }
 
 func normalizeURI(s []byte) []byte {

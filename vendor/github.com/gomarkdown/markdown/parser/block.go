@@ -17,6 +17,12 @@ const (
 	escapable  = "[!\"#$%&'()*+,./:;<=>?@[\\\\\\]^_`{|}~-]"
 )
 
+const (
+	captionTable  = "Table: "
+	captionFigure = "Figure: "
+	captionQuote  = "Quote: "
+)
+
 var (
 	reBackslashOrAmp      = regexp.MustCompile("[\\&]")
 	reEntityOrEscapedChar = regexp.MustCompile("(?i)\\\\" + escapable + "|" + charEntity)
@@ -24,52 +30,59 @@ var (
 	// blockTags is a set of tags that are recognized as HTML block tags.
 	// Any of these can be included in markdown text without special escaping.
 	blockTags = map[string]struct{}{
-		"blockquote": struct{}{},
-		"del":        struct{}{},
-		"div":        struct{}{},
-		"dl":         struct{}{},
-		"fieldset":   struct{}{},
-		"form":       struct{}{},
-		"h1":         struct{}{},
-		"h2":         struct{}{},
-		"h3":         struct{}{},
-		"h4":         struct{}{},
-		"h5":         struct{}{},
-		"h6":         struct{}{},
-		"iframe":     struct{}{},
-		"ins":        struct{}{},
-		"math":       struct{}{},
-		"noscript":   struct{}{},
-		"ol":         struct{}{},
-		"pre":        struct{}{},
-		"p":          struct{}{},
-		"script":     struct{}{},
-		"style":      struct{}{},
-		"table":      struct{}{},
-		"ul":         struct{}{},
+		"blockquote": {},
+		"del":        {},
+		"dd":         {},
+		"div":        {},
+		"dl":         {},
+		"dt":         {},
+		"fieldset":   {},
+		"form":       {},
+		"h1":         {},
+		"h2":         {},
+		"h3":         {},
+		"h4":         {},
+		"h5":         {},
+		"h6":         {},
+		// TODO: technically block but breaks Inline HTML (Simple).text
+		//"hr":         {},
+		"iframe":   {},
+		"ins":      {},
+		"li":       {},
+		"math":     {},
+		"noscript": {},
+		"ol":       {},
+		"pre":      {},
+		"p":        {},
+		"script":   {},
+		"style":    {},
+		"table":    {},
+		"ul":       {},
 
 		// HTML5
-		"address":    struct{}{},
-		"article":    struct{}{},
-		"aside":      struct{}{},
-		"canvas":     struct{}{},
-		"figcaption": struct{}{},
-		"figure":     struct{}{},
-		"footer":     struct{}{},
-		"header":     struct{}{},
-		"hgroup":     struct{}{},
-		"main":       struct{}{},
-		"nav":        struct{}{},
-		"output":     struct{}{},
-		"progress":   struct{}{},
-		"section":    struct{}{},
-		"video":      struct{}{},
+		"address":    {},
+		"article":    {},
+		"aside":      {},
+		"canvas":     {},
+		"details":    {},
+		"dialog":     {},
+		"figcaption": {},
+		"figure":     {},
+		"footer":     {},
+		"header":     {},
+		"hgroup":     {},
+		"main":       {},
+		"nav":        {},
+		"output":     {},
+		"progress":   {},
+		"section":    {},
+		"video":      {},
 	}
 )
 
-// sanitizeAnchorName returns a sanitized anchor name for the given text.
+// sanitizeHeadingID returns a sanitized anchor name for the given text.
 // Taken from https://github.com/shurcooL/sanitized_anchor_name/blob/master/main.go#L14:1
-func sanitizeAnchorName(text string) string {
+func sanitizeHeadingID(text string) string {
 	var anchorName []rune
 	var futureDash = false
 	for _, r := range text {
@@ -83,6 +96,9 @@ func sanitizeAnchorName(text string) string {
 		default:
 			futureDash = true
 		}
+	}
+	if len(anchorName) == 0 {
+		return "empty"
 	}
 	return string(anchorName)
 }
@@ -115,6 +131,16 @@ func (p *Parser) block(data []byte) {
 			}
 			if consumed > 0 {
 				included := f(p.includeStack.Last(), path, address)
+
+				// if we find a caption below this, we need to include it in 'included', so
+				// that the caption will be part of the include text. (+1 to skip newline)
+				for _, caption := range []string{captionFigure, captionTable, captionQuote} {
+					if _, _, capcon := p.caption(data[consumed+1:], []byte(caption)); capcon > 0 {
+						included = append(included, data[consumed+1:consumed+1+capcon]...)
+						consumed += 1 + capcon
+						break // there can only be 1 caption.
+					}
+				}
 				p.includeStack.Push(path)
 				p.block(included)
 				p.includeStack.Pop()
@@ -230,8 +256,10 @@ func (p *Parser) block(data []byte) {
 		// or
 		// ______
 		if p.isHRule(data) {
-			p.addBlock(&ast.HorizontalRule{})
 			i := skipUntilChar(data, 0, '\n')
+			hr := ast.HorizontalRule{}
+			hr.Literal = bytes.Trim(data[:i], " \n")
+			p.addBlock(&hr)
 			data = data[i:]
 			continue
 		}
@@ -269,12 +297,6 @@ func (p *Parser) block(data []byte) {
 			}
 		}
 
-		// table:
-		//
-		// Name  | Age | Phone
-		// ------|-----|---------
-		// Bob   | 31  | 555-1234
-		// Alice | 27  | 555-4321
 		if p.extensions&Tables != 0 {
 			if i := p.table(data); i > 0 {
 				data = data[i:]
@@ -289,7 +311,7 @@ func (p *Parser) block(data []byte) {
 		//
 		// also works with + or -
 		if p.uliPrefix(data) > 0 {
-			data = data[p.list(data, 0, 0):]
+			data = data[p.list(data, 0, 0, '.'):]
 			continue
 		}
 
@@ -299,14 +321,18 @@ func (p *Parser) block(data []byte) {
 		// 2. Item 2
 		if i := p.oliPrefix(data); i > 0 {
 			start := 0
-			if i > 2 && p.extensions&OrderedListStart != 0 {
-				s := string(data[:i-2])
-				start, _ = strconv.Atoi(s)
-				if start == 1 {
-					start = 0
+			delim := byte('.')
+			if i > 2 {
+				if p.extensions&OrderedListStart != 0 {
+					s := string(data[:i-2])
+					start, _ = strconv.Atoi(s)
+					if start == 1 {
+						start = 0
+					}
 				}
+				delim = data[i-2]
 			}
-			data = data[p.list(data, ast.ListTypeOrdered, start):]
+			data = data[p.list(data, ast.ListTypeOrdered, start, delim):]
 			continue
 		}
 
@@ -320,7 +346,7 @@ func (p *Parser) block(data []byte) {
 		// :   Definition c
 		if p.extensions&DefinitionLists != 0 {
 			if p.dliPrefix(data) > 0 {
-				data = data[p.list(data, ast.ListTypeDefinition, 0):]
+				data = data[p.list(data, ast.ListTypeDefinition, 0, '.'):]
 				continue
 			}
 		}
@@ -413,12 +439,13 @@ func (p *Parser) prefixHeading(data []byte) int {
 		end--
 	}
 	if end > i {
-		if id == "" && p.extensions&AutoHeadingIDs != 0 {
-			id = sanitizeAnchorName(string(data[i:end]))
-		}
 		block := &ast.Heading{
 			HeadingID: id,
 			Level:     level,
+		}
+		if id == "" && p.extensions&AutoHeadingIDs != 0 {
+			block.HeadingID = sanitizeHeadingID(string(data[i:end]))
+			p.allHeadingsWithAutoID = append(p.allHeadingsWithAutoID, block)
 		}
 		block.Content = data[i:end]
 		p.addBlock(block)
@@ -483,13 +510,14 @@ func (p *Parser) prefixSpecialHeading(data []byte) int {
 		end--
 	}
 	if end > i {
-		if id == "" && p.extensions&AutoHeadingIDs != 0 {
-			id = sanitizeAnchorName(string(data[i:end]))
-		}
 		block := &ast.Heading{
 			HeadingID: id,
 			IsSpecial: true,
 			Level:     1, // always level 1.
+		}
+		if id == "" && p.extensions&AutoHeadingIDs != 0 {
+			block.HeadingID = sanitizeHeadingID(string(data[i:end]))
+			p.allHeadingsWithAutoID = append(p.allHeadingsWithAutoID, block)
 		}
 		block.Literal = data[i:end]
 		block.Content = data[i:end]
@@ -638,7 +666,7 @@ func (p *Parser) html(data []byte, doRender bool) int {
 	if doRender {
 		// trim newlines
 		end := backChar(data, i, '\n')
-		htmlBLock := &ast.HTMLBlock{ast.Leaf{Content: data[:end]}}
+		htmlBLock := &ast.HTMLBlock{Leaf: ast.Leaf{Content: data[:end]}}
 		p.addBlock(htmlBLock)
 		finalizeHTMLBlock(htmlBLock)
 	}
@@ -660,7 +688,7 @@ func (p *Parser) htmlComment(data []byte, doRender bool) int {
 		if doRender {
 			// trim trailing newlines
 			end := backChar(data, size, '\n')
-			htmlBLock := &ast.HTMLBlock{ast.Leaf{Content: data[:end]}}
+			htmlBLock := &ast.HTMLBlock{Leaf: ast.Leaf{Content: data[:end]}}
 			p.addBlock(htmlBLock)
 			finalizeHTMLBlock(htmlBLock)
 		}
@@ -692,7 +720,7 @@ func (p *Parser) htmlHr(data []byte, doRender bool) int {
 			if doRender {
 				// trim newlines
 				end := backChar(data, size, '\n')
-				htmlBlock := &ast.HTMLBlock{ast.Leaf{Content: data[:end]}}
+				htmlBlock := &ast.HTMLBlock{Leaf: ast.Leaf{Content: data[:end]}}
 				p.addBlock(htmlBlock)
 				finalizeHTMLBlock(htmlBlock)
 			}
@@ -942,7 +970,7 @@ func (p *Parser) fencedCodeBlock(data []byte, doRender bool) int {
 		}
 
 		// Check for caption and if found make it a figure.
-		if captionContent, id, consumed := p.caption(data[beg:], []byte("Figure: ")); consumed > 0 {
+		if captionContent, id, consumed := p.caption(data[beg:], []byte(captionFigure)); consumed > 0 {
 			figure := &ast.CaptionFigure{}
 			caption := &ast.Caption{}
 			figure.HeadingID = id
@@ -994,255 +1022,6 @@ func finalizeCodeBlock(code *ast.CodeBlock) {
 		code.Literal = c
 	}
 	code.Content = nil
-}
-
-func (p *Parser) table(data []byte) int {
-	i, columns, table := p.tableHeader(data)
-	if i == 0 {
-		return 0
-	}
-
-	p.addBlock(&ast.TableBody{})
-
-	for i < len(data) {
-		pipes, rowStart := 0, i
-		for ; i < len(data) && data[i] != '\n'; i++ {
-			if data[i] == '|' {
-				pipes++
-			}
-		}
-
-		if pipes == 0 {
-			i = rowStart
-			break
-		}
-
-		// include the newline in data sent to tableRow
-		i = skipCharN(data, i, '\n', 1)
-
-		if p.tableFooter(data[rowStart:i]) {
-			continue
-		}
-
-		p.tableRow(data[rowStart:i], columns, false)
-	}
-	if captionContent, id, consumed := p.caption(data[i:], []byte("Table: ")); consumed > 0 {
-		caption := &ast.Caption{}
-		p.Inline(caption, captionContent)
-
-		// Some switcheroo to re-insert the parsed table as a child of the captionfigure.
-		figure := &ast.CaptionFigure{}
-		figure.HeadingID = id
-		table2 := &ast.Table{}
-		// Retain any block level attributes.
-		table2.AsContainer().Attribute = table.AsContainer().Attribute
-		children := table.GetChildren()
-		ast.RemoveFromTree(table)
-
-		table2.SetChildren(children)
-		ast.AppendChild(figure, table2)
-		ast.AppendChild(figure, caption)
-
-		p.addChild(figure)
-		p.finalize(figure)
-
-		i += consumed
-	}
-
-	return i
-}
-
-// check if the specified position is preceded by an odd number of backslashes
-func isBackslashEscaped(data []byte, i int) bool {
-	backslashes := 0
-	for i-backslashes-1 >= 0 && data[i-backslashes-1] == '\\' {
-		backslashes++
-	}
-	return backslashes&1 == 1
-}
-
-// tableHeaders parses the header. If recognized it will also add a table.
-func (p *Parser) tableHeader(data []byte) (size int, columns []ast.CellAlignFlags, table ast.Node) {
-	i := 0
-	colCount := 1
-	for i = 0; i < len(data) && data[i] != '\n'; i++ {
-		if data[i] == '|' && !isBackslashEscaped(data, i) {
-			colCount++
-		}
-	}
-
-	// doesn't look like a table header
-	if colCount == 1 {
-		return
-	}
-
-	// include the newline in the data sent to tableRow
-	j := skipCharN(data, i, '\n', 1)
-	header := data[:j]
-
-	// column count ignores pipes at beginning or end of line
-	if data[0] == '|' {
-		colCount--
-	}
-	if i > 2 && data[i-1] == '|' && !isBackslashEscaped(data, i-1) {
-		colCount--
-	}
-
-	columns = make([]ast.CellAlignFlags, colCount)
-
-	// move on to the header underline
-	i++
-	if i >= len(data) {
-		return
-	}
-
-	if data[i] == '|' && !isBackslashEscaped(data, i) {
-		i++
-	}
-	i = skipChar(data, i, ' ')
-
-	// each column header is of form: / *:?-+:? *|/ with # dashes + # colons >= 3
-	// and trailing | optional on last column
-	col := 0
-	n := len(data)
-	for i < n && data[i] != '\n' {
-		dashes := 0
-
-		if data[i] == ':' {
-			i++
-			columns[col] |= ast.TableAlignmentLeft
-			dashes++
-		}
-		for i < n && data[i] == '-' {
-			i++
-			dashes++
-		}
-		if i < n && data[i] == ':' {
-			i++
-			columns[col] |= ast.TableAlignmentRight
-			dashes++
-		}
-		for i < n && data[i] == ' ' {
-			i++
-		}
-		if i == n {
-			return
-		}
-		// end of column test is messy
-		switch {
-		case dashes < 3:
-			// not a valid column
-			return
-
-		case data[i] == '|' && !isBackslashEscaped(data, i):
-			// marker found, now skip past trailing whitespace
-			col++
-			i++
-			for i < n && data[i] == ' ' {
-				i++
-			}
-
-			// trailing junk found after last column
-			if col >= colCount && i < len(data) && data[i] != '\n' {
-				return
-			}
-
-		case (data[i] != '|' || isBackslashEscaped(data, i)) && col+1 < colCount:
-			// something else found where marker was required
-			return
-
-		case data[i] == '\n':
-			// marker is optional for the last column
-			col++
-
-		default:
-			// trailing junk found after last column
-			return
-		}
-	}
-	if col != colCount {
-		return
-	}
-
-	table = &ast.Table{}
-	p.addBlock(table)
-	p.addBlock(&ast.TableHeader{})
-	p.tableRow(header, columns, true)
-	size = skipCharN(data, i, '\n', 1)
-	return
-}
-
-func (p *Parser) tableRow(data []byte, columns []ast.CellAlignFlags, header bool) {
-	p.addBlock(&ast.TableRow{})
-	i, col := 0, 0
-
-	if data[i] == '|' && !isBackslashEscaped(data, i) {
-		i++
-	}
-
-	n := len(data)
-	for col = 0; col < len(columns) && i < n; col++ {
-		for i < n && data[i] == ' ' {
-			i++
-		}
-
-		cellStart := i
-
-		for i < n && (data[i] != '|' || isBackslashEscaped(data, i)) && data[i] != '\n' {
-			i++
-		}
-
-		cellEnd := i
-
-		// skip the end-of-cell marker, possibly taking us past end of buffer
-		i++
-
-		for cellEnd > cellStart && cellEnd-1 < n && data[cellEnd-1] == ' ' {
-			cellEnd--
-		}
-
-		block := &ast.TableCell{
-			IsHeader: header,
-			Align:    columns[col],
-		}
-		block.Content = data[cellStart:cellEnd]
-		p.addBlock(block)
-	}
-
-	// pad it out with empty columns to get the right number
-	for ; col < len(columns); col++ {
-		block := &ast.TableCell{
-			IsHeader: header,
-			Align:    columns[col],
-		}
-		p.addBlock(block)
-	}
-
-	// silently ignore rows with too many cells
-}
-
-// tableFooter parses the (optional) table footer.
-func (p *Parser) tableFooter(data []byte) bool {
-	colCount := 1
-	for i := 0; i < len(data) && data[i] != '\n'; i++ {
-		if data[i] == '|' && !isBackslashEscaped(data, i) {
-			colCount++
-			continue
-		}
-		// remaining data must be the = character
-		if data[i] != '=' {
-			return false
-		}
-	}
-
-	// doesn't look like a table footer
-	if colCount == 1 {
-		return false
-	}
-
-	p.addBlock(&ast.TableFooter{})
-
-	return true
 }
 
 // returns blockquote prefix length
@@ -1311,7 +1090,7 @@ func (p *Parser) quote(data []byte) int {
 		return end
 	}
 
-	if captionContent, id, consumed := p.caption(data[end:], []byte("Quote: ")); consumed > 0 {
+	if captionContent, id, consumed := p.caption(data[end:], []byte(captionQuote)); consumed > 0 {
 		figure := &ast.CaptionFigure{}
 		caption := &ast.Caption{}
 		figure.HeadingID = id
@@ -1431,7 +1210,7 @@ func (p *Parser) oliPrefix(data []byte) int {
 	}
 
 	// we need >= 1 digits followed by a dot and a space or a tab
-	if data[i] != '.' || !(data[i+1] == ' ' || data[i+1] == '\t') {
+	if data[i] != '.' && data[i] != ')' || !(data[i+1] == ' ' || data[i+1] == '\t') {
 		return 0
 	}
 	return i + 2
@@ -1451,13 +1230,14 @@ func (p *Parser) dliPrefix(data []byte) int {
 }
 
 // parse ordered or unordered list block
-func (p *Parser) list(data []byte, flags ast.ListType, start int) int {
+func (p *Parser) list(data []byte, flags ast.ListType, start int, delim byte) int {
 	i := 0
 	flags |= ast.ListItemBeginningOfList
 	list := &ast.List{
 		ListFlags: flags,
 		Tight:     true,
 		Start:     start,
+		Delimiter: delim,
 	}
 	block := p.addBlock(list)
 
@@ -1546,10 +1326,16 @@ func (p *Parser) listItem(data []byte, flags *ast.ListType) int {
 		}
 	}
 
-	var bulletChar byte = '*'
+	var (
+		bulletChar byte = '*'
+		delimiter  byte = '.'
+	)
 	i := p.uliPrefix(data)
 	if i == 0 {
 		i = p.oliPrefix(data)
+		if i > 0 {
+			delimiter = data[i-2]
+		}
 	} else {
 		bulletChar = data[i-2]
 	}
@@ -1709,7 +1495,7 @@ gatherlines:
 		ListFlags:  *flags,
 		Tight:      false,
 		BulletChar: bulletChar,
-		Delimiter:  '.', // Only '.' is possible in Markdown, but ')' will also be possible in CommonMark
+		Delimiter:  delimiter,
 	}
 	p.addBlock(listItem)
 
@@ -1815,7 +1601,7 @@ func (p *Parser) paragraph(data []byte) int {
 			// did this blank line followed by a definition list item?
 			if p.extensions&DefinitionLists != 0 {
 				if i < len(data)-1 && data[i+1] == ':' {
-					listLen := p.list(data[prev:], ast.ListTypeDefinition, 0)
+					listLen := p.list(data[prev:], ast.ListTypeDefinition, 0, '.')
 					return prev + listLen
 				}
 			}
@@ -1839,15 +1625,14 @@ func (p *Parser) paragraph(data []byte) int {
 					eol--
 				}
 
-				id := ""
+				block := &ast.Heading{
+					Level: level,
+				}
 				if p.extensions&AutoHeadingIDs != 0 {
-					id = sanitizeAnchorName(string(data[prev:eol]))
+					block.HeadingID = sanitizeHeadingID(string(data[prev:eol]))
+					p.allHeadingsWithAutoID = append(p.allHeadingsWithAutoID, block)
 				}
 
-				block := &ast.Heading{
-					Level:     level,
-					HeadingID: id,
-				}
 				block.Content = data[prev:eol]
 				p.addBlock(block)
 
@@ -1887,10 +1672,18 @@ func (p *Parser) paragraph(data []byte) int {
 			}
 		}
 
+		// if there's a table, paragraph is over
+		if p.extensions&Tables != 0 {
+			if j, _, _ := p.tableHeader(current, false); j > 0 {
+				p.renderParagraph(data[:i])
+				return i
+			}
+		}
+
 		// if there's a definition list item, prev line is a definition term
 		if p.extensions&DefinitionLists != 0 {
 			if p.dliPrefix(current) != 0 {
-				ret := p.list(data[prev:], ast.ListTypeDefinition, 0)
+				ret := p.list(data[prev:], ast.ListTypeDefinition, 0, '.')
 				return ret + prev
 			}
 		}
