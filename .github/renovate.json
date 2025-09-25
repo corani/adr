@@ -27,10 +27,6 @@
         }
     ],
     "dependencyDashboardLabels": ["renovate"],
-    "enableManagers": [
-      "gomod",
-      "github-actions"
-    ],
     "prConcurrentLimit": 4,
     "automergeType": "pr",
     "platformAutomerge": true
