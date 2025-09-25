@@ -2,15 +2,14 @@ package text
 
 import (
 	"fmt"
+	"os"
 	"sort"
 	"strconv"
 	"strings"
 	"sync"
 )
 
-var (
-	colorsEnabled = areANSICodesSupported()
-)
+var colorsEnabled = areColorsOnInTheEnv() && areANSICodesSupported()
 
 // DisableColors (forcefully) disables color coding globally.
 func DisableColors() {
@@ -22,8 +21,17 @@ func EnableColors() {
 	colorsEnabled = true
 }
 
+// areColorsOnInTheEnv returns true is colors are not disable using
+// well known environment variables.
+func areColorsOnInTheEnv() bool {
+	if os.Getenv("FORCE_COLOR") == "1" {
+		return true
+	}
+	return os.Getenv("NO_COLOR") == "" || os.Getenv("NO_COLOR") == "0"
+}
+
 // The logic here is inspired from github.com/fatih/color; the following is
-// the the bare minimum logic required to print Colored to the console.
+// the bare minimum logic required to print Colored to the console.
 // The differences:
 // * This one caches the escape sequences for cases with multiple colors
 // * This one handles cases where the incoming already has colors in the
@@ -123,10 +131,8 @@ func (c Color) Sprintf(format string, a ...interface{}) string {
 // Example: Colors{FgCyan, BgBlack}
 type Colors []Color
 
-var (
-	// colorsSeqMap caches the escape sequence for a set of colors
-	colorsSeqMap = sync.Map{}
-)
+// colorsSeqMap caches the escape sequence for a set of colors
+var colorsSeqMap = sync.Map{}
 
 // EscapeSeq returns the ANSI escape sequence for the colors set.
 func (c Colors) EscapeSeq() string {
