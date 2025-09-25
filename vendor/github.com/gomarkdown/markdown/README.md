@@ -6,16 +6,26 @@ Package `github.com/gomarkdown/markdown` is a very fast Go library for parsing [
 
 It's fast and supports common extensions.
 
-## Installation
-
-    go get -u github.com/gomarkdown/markdown
-
-API Docs:
+## API Docs:
 
 - https://godoc.org/github.com/gomarkdown/markdown : top level package
 - https://godoc.org/github.com/gomarkdown/markdown/ast : defines abstract syntax tree of parsed markdown document
 - https://godoc.org/github.com/gomarkdown/markdown/parser : parser
 - https://godoc.org/github.com/gomarkdown/markdown/html : html renderer
+
+## Users
+
+Some tools using this package:
+
+- https://github.com/MichaelMure/go-term-markdown : markdown renderer for the terminal
+- https://github.com/artyom/mdserver : web server that serves markdown files
+- https://github.com/rsdoiel/mkpage : content management system generating static websites
+- https://github.com/cugu/dashboard : creates a badge dashboard from a yaml file
+- https://github.com/ieyasu/go-bwiki : simple wiki
+- https://github.com/romanyx/mdopen : view markdown files in the default browser
+- https://github.com/ystyle/sqlmanager : a library for manager sql with markdown like beetsql
+- https://gitlab.com/kendellfab/fazer : library for making templates
+- https://github.com/blmayer/tasker : a simple task list web app
 
 ## Usage
 
@@ -100,7 +110,7 @@ opts := html.RendererOptions{
 }
 renderer := html.NewRenderer(opts)
 md := "test\n```\nthis code block will be dropped from output\n```\ntext"
-html := markdown.ToHTML([]byte(s), nil, renderer)
+html := markdown.ToHTML([]byte(md), nil, renderer)
 ````
 
 ## Sanitize untrusted content
@@ -120,6 +130,12 @@ import (
 maybeUnsafeHTML := markdown.ToHTML(md, nil, nil)
 html := bluemonday.UGCPolicy().SanitizeBytes(maybeUnsafeHTML)
 ```
+
+## Windows / Mac newlines
+
+The library only supports Unix newlines. If you have markdown text with possibly
+Windows / Mac newlines, normalize newlines before caling this librar using
+`d = markdown.NormalizeNewlines(d)`
 
 ## mdtohtml command-line tool
 
@@ -198,6 +214,18 @@ implements the following extensions:
   Total   | 50
   ```
 
+  A cell spanning multiple columns (colspan) is supported, just repeat the pipe symbol:
+
+  ```
+  Name    | Age
+  --------|------
+  Bob     ||
+  Alice   | 23
+  ========|======
+  Total   | 23
+  ```
+
+
 - **Fenced code blocks**. In addition to the normal 4-space
   indentation to mark code blocks, you can explicitly mark them
   and supply a language (to make syntax highlighting simple). Just
@@ -238,10 +266,10 @@ implements the following extensions:
   should be crossed out.
 
 - **Hard line breaks**. With this extension enabled newlines in the input
-  translate into line breaks in the output. This extension is off by default.
+  translates into line breaks in the output. This extension is off by default.
 
-- **Non blocking space**. With this extension enabled spaces preceeded by an backslash n the input
-  translate non-blocking spaces in the output. This extension is off by default.
+- **Non blocking space**. With this extension enabled spaces preceeded by a backslash
+  in the input translates non-blocking spaces in the output. This extension is off by default.
 
 - **Smart quotes**. Smartypants-style punctuation substitution is
   supported, turning normal double- and single-quote marks into
@@ -260,9 +288,9 @@ implements the following extensions:
   <sup>4</sup>&frasl;<sub>5</sub>.
 
 - **MathJaX Support** is an additional feature which is supported by
-  many markdown editor. It translate inline math equation quoted by `$`
-  and display math block quoted by `$$` into MathJax compatible format.
-  hyphen `_` won't break LaTeX render within a math element any more.
+  many markdown editor. It translates inline math equations quoted by `$`
+  and displays math blocks quoted by `$$` into MathJax compatible format.
+  Hyphens (`_`) won't break LaTeX render within a math element any more.
 
   ```
   $$
@@ -278,13 +306,13 @@ implements the following extensions:
    $$
   ```
 
-- **Ordered list start number**. With this extension enabled an ordered list will start with the
+- **Ordered list start number**. With this extension enabled an ordered list will start with
   the number that was used to start it.
 
 - **Super and subscript**. With this extension enabled sequences between ^ will indicate
   superscript and ~ will become a subscript. For example: H~2~O is a liquid, 2^10^ is 1024.
 
-- **Block level attributes**, allow setting attributes (ID, classes and key/value pairs) on block
+- **Block level attributes** allow setting attributes (ID, classes and key/value pairs) on block
   level elements. The attribute must be enclosed with braces and be put on a line before the
   element.
 

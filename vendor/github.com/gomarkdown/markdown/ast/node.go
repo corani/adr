@@ -1,5 +1,14 @@
 package ast
 
+// An attribute can be attached to block elements. They are specified as
+// {#id .classs key="value"} where quotes for values are mandatory, multiple
+// key/value pairs are separated by whitespace.
+type Attribute struct {
+	ID      []byte
+	Classes [][]byte
+	Attrs   map[string][]byte
+}
+
 // ListType contains bitwise or'ed flags for list and list item objects.
 type ListType int
 
@@ -250,11 +259,12 @@ type Del struct {
 type Link struct {
 	Container
 
-	Destination []byte // Destination is what goes into a href
-	Title       []byte // Title is the tooltip thing that goes in a title attribute
-	NoteID      int    // NoteID contains a serial number of a footnote, zero if it's not a footnote
-	Footnote    Node   // If it's a footnote, this is a direct link to the footnote Node. Otherwise nil.
-	DeferredID  []byte // If a deferred link this holds the original ID.
+	Destination          []byte   // Destination is what goes into a href
+	Title                []byte   // Title is the tooltip thing that goes in a title attribute
+	NoteID               int      // NoteID contains a serial number of a footnote, zero if it's not a footnote
+	Footnote             Node     // If it's a footnote, this is a direct link to the footnote Node. Otherwise nil.
+	DeferredID           []byte   // If a deferred link this holds the original ID.
+	AdditionalAttributes []string // Defines additional attributes to use during rendering.
 }
 
 // CrossReference is a reference node.
@@ -339,6 +349,7 @@ type TableCell struct {
 
 	IsHeader bool           // This tells if it's under the header row
 	Align    CellAlignFlags // This holds the value for align attribute
+	ColSpan  int            // How many columns to span
 }
 
 // TableHeader represents markdown table head node
