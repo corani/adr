@@ -33,8 +33,8 @@ require (
 	github.com/rivo/uniseg v0.2.0 // indirect
 	github.com/spf13/pflag v1.0.9 // indirect
 	golang.org/x/image v0.5.0 // indirect
-	golang.org/x/net v0.17.0 // indirect
-	golang.org/x/sys v0.13.0 // indirect
+	golang.org/x/net v0.38.0 // indirect
+	golang.org/x/sys v0.31.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20200227125254-8fa46927fb4f // indirect
 	gopkg.in/yaml.v2 v2.3.0 // indirect
 )
