@@ -12,14 +12,18 @@ import (
 func List() error {
 	conf, err := config.ReadConfig()
 	if err != nil {
-		return fmt.Errorf("%w: list: %v", ErrInternal, err)
+		return fmt.Errorf("%w: list: %w", ErrInternal, err)
 	}
 
 	tbl := table.NewWriter()
 
 	tbl.SetOutputMirror(os.Stdout)
 	tbl.SetStyle(table.StyleRounded)
-	tbl.SortBy([]table.SortBy{{Name: "#", Mode: table.AscNumeric}})
+	tbl.SortBy([]table.SortBy{{
+		Name:   "#",
+		Number: 0,
+		Mode:   table.AscNumeric,
+	}})
 	tbl.AppendHeader(table.Row{"#", "date", "status", "title"})
 
 	err = adr.ForEach(conf, func(v *adr.Adr) error {
@@ -33,7 +37,7 @@ func List() error {
 		return nil
 	})
 	if err != nil {
-		return fmt.Errorf("%w: list: %v", ErrInternal, err)
+		return fmt.Errorf("%w: list: %w", ErrInternal, err)
 	}
 
 	tbl.Render()

@@ -1,6 +1,6 @@
 module github.com/corani/adr
 
-go 1.19
+go 1.24
 
 require (
 	github.com/MichaelMure/go-term-markdown v0.1.4
