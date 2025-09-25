@@ -5,7 +5,7 @@ go 1.24
 require (
 	github.com/MichaelMure/go-term-markdown v0.1.4
 	github.com/adrg/frontmatter v0.2.0
-	github.com/gosimple/slug v1.13.1
+	github.com/gosimple/slug v1.15.0
 	github.com/jedib0t/go-pretty/v6 v6.4.6
 	github.com/spf13/cobra v1.10.1
 	gopkg.in/yaml.v3 v3.0.1
