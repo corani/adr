@@ -3,7 +3,7 @@ package cmd
 import (
 	"log"
 
-	"github.com/corani/adr/internal"
+	"github.com/corani/adr/internal/app"
 	"github.com/spf13/cobra"
 )
 
@@ -21,7 +21,7 @@ var initCmd = &cobra.Command{
 			path = args[0]
 		}
 
-		if err := internal.Init(path); err != nil {
+		if err := app.Init(path); err != nil {
 			log.Printf("couldn't initialize adr: %v", err)
 
 			return

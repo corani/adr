@@ -4,7 +4,7 @@ import (
 	"log"
 	"strconv"
 
-	"github.com/corani/adr/internal"
+	"github.com/corani/adr/internal/app"
 	"github.com/spf13/cobra"
 )
 
@@ -24,7 +24,7 @@ var showCmd = &cobra.Command{
 			return
 		}
 
-		if err := internal.Show(number); err != nil {
+		if err := app.Show(number); err != nil {
 			log.Printf("couldn't show adr %d: %v", number, err)
 		}
 	},

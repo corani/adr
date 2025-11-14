@@ -1,4 +1,4 @@
-package internal
+package app
 
 import (
 	"fmt"
@@ -39,7 +39,7 @@ func Init(path string) error {
 	log.Printf("create %q", conf.AdrTemplate)
 
 	if err := writeTemplate(
-		"template/template.md", filepath.Join(root, conf.AdrTemplate),
+		"template.md", filepath.Join(root, conf.AdrTemplate),
 	); err != nil {
 		return err
 	}
@@ -47,7 +47,7 @@ func Init(path string) error {
 	log.Printf("create %q", conf.IndexTemplate)
 
 	if err := writeTemplate(
-		"template/index.md", filepath.Join(root, conf.IndexTemplate),
+		"index.md", filepath.Join(root, conf.IndexTemplate),
 	); err != nil {
 		return err
 	}

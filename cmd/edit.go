@@ -4,7 +4,7 @@ import (
 	"log"
 	"strconv"
 
-	"github.com/corani/adr/internal"
+	"github.com/corani/adr/internal/app"
 	"github.com/spf13/cobra"
 )
 
@@ -22,7 +22,7 @@ var editCmd = &cobra.Command{
 			return
 		}
 
-		if err := internal.Edit(number); err != nil {
+		if err := app.Edit(number); err != nil {
 			log.Printf("couldn't edit adr %d: %v", number, err)
 		}
 	},

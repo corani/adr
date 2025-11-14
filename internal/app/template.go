@@ -1,16 +1,14 @@
-package internal
+package app
 
 import (
-	"embed"
 	"fmt"
 	"os"
+
+	tmpl "github.com/corani/adr/internal/template"
 )
 
-//go:embed template
-var template embed.FS
-
 func writeTemplate(source, target string) error {
-	body, err := template.ReadFile(source)
+	body, err := tmpl.Get(source)
 	if err != nil {
 		return fmt.Errorf("%w: writeTemplate: %w", ErrInternal, err)
 	}

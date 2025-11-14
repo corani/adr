@@ -4,7 +4,7 @@ import (
 	"log"
 	"strings"
 
-	"github.com/corani/adr/internal"
+	"github.com/corani/adr/internal/app"
 	"github.com/spf13/cobra"
 )
 
@@ -18,7 +18,7 @@ var newCmd = &cobra.Command{
 	Run: func(_ *cobra.Command, args []string) {
 		title := strings.Join(args, " ")
 
-		if err := internal.Create(title); err != nil {
+		if err := app.Create(title); err != nil {
 			log.Printf("couldn't create adr: %v", err)
 		}
 	},
