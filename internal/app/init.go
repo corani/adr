@@ -8,6 +8,7 @@ import (
 
 	"github.com/corani/adr/internal/adr"
 	"github.com/corani/adr/internal/config"
+	"github.com/corani/adr/internal/template"
 )
 
 func Init(path string) error {
@@ -38,15 +39,15 @@ func Init(path string) error {
 
 	log.Printf("create %q", conf.AdrTemplate)
 
-	if err := writeTemplate(
-		"template.md", filepath.Join(root, conf.AdrTemplate),
+	if err := template.Write(
+		"adr.md", filepath.Join(root, conf.AdrTemplate),
 	); err != nil {
 		return err
 	}
 
 	log.Printf("create %q", conf.IndexTemplate)
 
-	if err := writeTemplate(
+	if err := template.Write(
 		"index.md", filepath.Join(root, conf.IndexTemplate),
 	); err != nil {
 		return err

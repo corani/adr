@@ -1,14 +1,12 @@
-package app
+package template
 
 import (
 	"fmt"
 	"os"
-
-	tmpl "github.com/corani/adr/internal/template"
 )
 
-func writeTemplate(source, target string) error {
-	body, err := tmpl.Get(source)
+func Write(source, target string) error {
+	body, err := Get(source)
 	if err != nil {
 		return fmt.Errorf("%w: writeTemplate: %w", ErrInternal, err)
 	}

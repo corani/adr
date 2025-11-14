@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-//go:embed template.md index.md
+//go:embed adr.md index.md
 var files embed.FS
 
 func Get(name string) ([]byte, error) {
