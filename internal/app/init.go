@@ -1,4 +1,4 @@
-package internal
+package app
 
 import (
 	"fmt"
@@ -8,6 +8,7 @@ import (
 
 	"github.com/corani/adr/internal/adr"
 	"github.com/corani/adr/internal/config"
+	"github.com/corani/adr/internal/template"
 )
 
 func Init(path string) error {
@@ -38,18 +39,14 @@ func Init(path string) error {
 
 	log.Printf("create %q", conf.AdrTemplate)
 
-	if err := writeTemplate(
-		"template/template.md", filepath.Join(root, conf.AdrTemplate),
-	); err != nil {
-		return err
+	if err := template.Write("adr.md", filepath.Join(root, conf.AdrTemplate)); err != nil {
+		return fmt.Errorf("%w: init: %w", ErrInternal, err)
 	}
 
 	log.Printf("create %q", conf.IndexTemplate)
 
-	if err := writeTemplate(
-		"template/index.md", filepath.Join(root, conf.IndexTemplate),
-	); err != nil {
-		return err
+	if err := template.Write("index.md", filepath.Join(root, conf.IndexTemplate)); err != nil {
+		return fmt.Errorf("%w: init: %w", ErrInternal, err)
 	}
 
 	if err := adr.Index(conf); err != nil {

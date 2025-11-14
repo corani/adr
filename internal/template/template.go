@@ -1,16 +1,12 @@
-package internal
+package template
 
 import (
-	"embed"
 	"fmt"
 	"os"
 )
 
-//go:embed template
-var template embed.FS
-
-func writeTemplate(source, target string) error {
-	body, err := template.ReadFile(source)
+func Write(source, target string) error {
+	body, err := Get(source)
 	if err != nil {
 		return fmt.Errorf("%w: writeTemplate: %w", ErrInternal, err)
 	}

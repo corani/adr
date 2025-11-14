@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/corani/adr/internal"
+	"github.com/corani/adr/internal/app"
 	"github.com/spf13/cobra"
 )
 
@@ -26,7 +26,7 @@ var updateCmd = &cobra.Command{
 
 		status := strings.ToLower(args[1])
 
-		if err := internal.Update(number, status); err != nil {
+		if err := app.Update(number, status); err != nil {
 			log.Printf("couldn't update adr %d: %v", number, err)
 		}
 	},

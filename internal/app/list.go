@@ -1,4 +1,4 @@
-package internal
+package app
 
 import (
 	"fmt"
@@ -28,12 +28,7 @@ func List() error {
 	tbl.AppendHeader(table.Row{"#", "date", "status", "title"})
 
 	err = adr.ForEach(conf, func(v *adr.Adr) error {
-		tbl.AppendRow(table.Row{
-			fmt.Sprintf("%04d", v.Number),
-			v.Date,
-			v.Status,
-			v.Title,
-		})
+		tbl.AppendRow(table.Row{fmt.Sprintf("%04d", v.Number), v.Date, v.Status, v.Title})
 
 		return nil
 	})

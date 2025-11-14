@@ -21,8 +21,3 @@ func Execute() {
 		os.Exit(1)
 	}
 }
-
-//nolint:gochecknoinits
-func init() {
-	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
-}

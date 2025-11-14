@@ -1,13 +1,14 @@
-package internal
+package app
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/corani/adr/internal/adr"
 	"github.com/corani/adr/internal/config"
 )
 
-func Create(title string) error {
+func Create(ctx context.Context, title string) error {
 	conf, err := config.ReadConfig()
 	if err != nil {
 		return fmt.Errorf("%w: create: %w", ErrInternal, err)
@@ -18,5 +19,5 @@ func Create(title string) error {
 		return fmt.Errorf("%w: create: %w", ErrInternal, err)
 	}
 
-	return Edit(int(v.Number))
+	return Edit(ctx, int(v.Number))
 }
