@@ -12,9 +12,7 @@ import (
 	"github.com/corani/adr/internal/config"
 )
 
-func Edit(number int) error {
-	ctx := context.TODO()
-
+func Edit(ctx context.Context, number int) error {
 	conf, err := config.ReadConfig()
 	if err != nil {
 		return fmt.Errorf("%w: edit: %w", ErrInternal, err)

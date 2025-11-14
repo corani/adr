@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"context"
 	"log"
 	"strings"
 
@@ -16,9 +17,10 @@ var newCmd = &cobra.Command{
 	Aliases: []string{"add", "create"},
 	Short:   "create a new ADR with optional title",
 	Run: func(_ *cobra.Command, args []string) {
+		ctx := context.TODO()
 		title := strings.Join(args, " ")
 
-		if err := app.Create(title); err != nil {
+		if err := app.Create(ctx, title); err != nil {
 			log.Printf("couldn't create adr: %v", err)
 		}
 	},

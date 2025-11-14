@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"context"
 	"log"
 	"strconv"
 
@@ -15,6 +16,8 @@ var editCmd = &cobra.Command{
 	Use:   "edit <id>",
 	Short: "open the adr with number <id> in the default editor",
 	Run: func(_ *cobra.Command, args []string) {
+		ctx := context.TODO()
+
 		number, err := strconv.Atoi(args[0])
 		if err != nil {
 			log.Printf("invalid argument: %v", err)
@@ -22,7 +25,7 @@ var editCmd = &cobra.Command{
 			return
 		}
 
-		if err := app.Edit(number); err != nil {
+		if err := app.Edit(ctx, number); err != nil {
 			log.Printf("couldn't edit adr %d: %v", number, err)
 		}
 	},

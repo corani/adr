@@ -39,18 +39,14 @@ func Init(path string) error {
 
 	log.Printf("create %q", conf.AdrTemplate)
 
-	if err := template.Write(
-		"adr.md", filepath.Join(root, conf.AdrTemplate),
-	); err != nil {
-		return err
+	if err := template.Write("adr.md", filepath.Join(root, conf.AdrTemplate)); err != nil {
+		return fmt.Errorf("%w: init: %w", ErrInternal, err)
 	}
 
 	log.Printf("create %q", conf.IndexTemplate)
 
-	if err := template.Write(
-		"index.md", filepath.Join(root, conf.IndexTemplate),
-	); err != nil {
-		return err
+	if err := template.Write("index.md", filepath.Join(root, conf.IndexTemplate)); err != nil {
+		return fmt.Errorf("%w: init: %w", ErrInternal, err)
 	}
 
 	if err := adr.Index(conf); err != nil {
