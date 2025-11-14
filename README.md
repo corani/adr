@@ -19,3 +19,11 @@ A simple command-line tool to manage ADRs in markdown format.
   Update the ADR with the given id, setting the status to one of: `proposed`, `accepted`,
   `deprecated` or `superseded`.
 
+Note: The repository no longer commits a `vendor/` directory. Dependencies are managed
+via Go modules. To recreate a `vendor/` directory locally, run:
+
+```
+ADR_VENDOR=true ./tools/install.sh
+```
+
+

@@ -12,10 +12,8 @@ done
 echo "[CMD] go get ..."
 go get ${tools}
 
-echo "[CMD] go mod tidy" 
+echo "[CMD] go mod tidy"
 go mod tidy
-echo "[CMD] go mod vendor" 
-go mod vendor
 
 echo "[CMD] go install ..."
 go install ${tools}
