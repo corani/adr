@@ -24,6 +24,7 @@ func List() error {
 		Mode:       table.AscNumeric,
 		Number:     0,
 		IgnoreCase: false,
+		CustomLess: nil,
 	}})
 	tbl.AppendHeader(table.Row{"#", "date", "status", "title"})
 
