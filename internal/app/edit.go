@@ -25,7 +25,7 @@ func Edit(ctx context.Context, number int) error {
 
 	log.Printf("editing ADR: %v", filepath.Join(conf.Root, found.Filename))
 
-	// #nosec G204
+	// #nosec G204,G702 // Command injection via environment variable
 	cmd := exec.CommandContext(ctx, os.Getenv("EDITOR"), filepath.Join(conf.Project, conf.Root, found.Filename))
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
