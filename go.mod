@@ -43,7 +43,7 @@ require (
 	github.com/spf13/pflag v1.0.9 // indirect
 	github.com/spf13/viper v1.10.1 // indirect
 	github.com/subosito/gotenv v1.2.0 // indirect
-	golang.org/x/image v0.38.0 // indirect
+	golang.org/x/image v0.41.0 // indirect
 	golang.org/x/net v0.55.0 // indirect
 	golang.org/x/sys v0.45.0 // indirect
 	golang.org/x/text v0.37.0 // indirect
