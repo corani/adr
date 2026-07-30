@@ -8,29 +8,24 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// showCmd represents the show command.
-//
-//nolint:exhaustruct,gochecknoglobals
-var showCmd = &cobra.Command{
-	Use:     "show <id>",
-	Aliases: []string{"view"},
-	Short:   "show the adr with number <id>",
-	Args:    cobra.ExactArgs(1),
-	Run: func(_ *cobra.Command, args []string) {
-		number, err := strconv.Atoi(args[0])
-		if err != nil {
-			log.Printf("invalid argument: %v", err)
+func NewShowCommand() *cobra.Command {
+	//nolint:exhaustruct
+	return &cobra.Command{
+		Use:     "show <id>",
+		Aliases: []string{"view"},
+		Short:   "show the adr with number <id>",
+		Args:    cobra.ExactArgs(1),
+		Run: func(_ *cobra.Command, args []string) {
+			number, err := strconv.Atoi(args[0])
+			if err != nil {
+				log.Printf("invalid argument: %v", err)
 
-			return
-		}
+				return
+			}
 
-		if err := app.Show(number); err != nil {
-			log.Printf("couldn't show adr %d: %v", number, err)
-		}
-	},
-}
-
-//nolint:gochecknoinits
-func init() {
-	rootCmd.AddCommand(showCmd)
+			if err := app.Show(number); err != nil {
+				log.Printf("couldn't show adr %d: %v", number, err)
+			}
+		},
+	}
 }
