@@ -32,15 +32,27 @@ import (
 )
 
 func newRootCommand() *cobra.Command {
+	conf, err := config.ReadConfig()
+	if err != nil && !os.IsNotExist(err) {
+		log.Fatalf("couldn't read config: %v", err)
+	}
+
 	//nolint:exhaustruct
 	root := &cobra.Command{
 		Use:   os.Args[0],
 		Short: "A command line tool to maintain Architecture Decision Records",
-	}
+		PersistentPreRunE: func(c *cobra.Command, _ []string) error {
+			switch c.Name() {
+			case "init", "version", "help", "completion":
+				return nil
+			}
 
-	conf, err := config.ReadConfig()
-	if err != nil && !os.IsNotExist(err) {
-		log.Printf("couldn't read config: %v", err)
+			if conf == nil {
+				log.Fatal("no ADR configuration found, run 'adr init' first")
+			}
+
+			return nil
+		},
 	}
 
 	root.AddCommand(cmd.AdrCommands(conf)...)
