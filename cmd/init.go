@@ -12,7 +12,16 @@ func NewInitConfigCommand() *cobra.Command {
 	//nolint:exhaustruct
 	return &cobra.Command{
 		Use:   "init [path]",
-		Short: "initialize the adr path (default is `docs/adr`)",
+		Short: "Initialize the ADR path (default is `docs/adr`)",
+		Long: `Initialize the ADR directory and configuration.
+
+Creates the ADR directory, writes .adr.yaml at the project root, and copies
+the default ADR and index templates into the directory. The project root is
+determined by walking up from the current directory until a .git directory
+is found.
+
+The path argument sets the ADR directory relative to the project root
+(default: docs/adr).`,
 		Args:  cobra.MaximumNArgs(1),
 		Run: func(_ *cobra.Command, args []string) {
 			path := "docs/adr"
@@ -39,7 +48,10 @@ func NewInitCommand(conf *config.Config) *cobra.Command {
 	//nolint:exhaustruct
 	return &cobra.Command{
 		Use:   "init",
-		Short: "initialize the adr path",
+		Short: "Initialize the ADR path",
+		Long: `Initialize the ADR directory using the pre-configured path.
+
+Creates the ADR directory and copies the default ADR and index templates into it.`,
 		Run: func(_ *cobra.Command, args []string) {
 			if err := app.Init(conf); err != nil {
 				log.Printf("couldn't initialize adr: %v", err)

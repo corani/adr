@@ -6,8 +6,8 @@ import (
 )
 
 // EmbedCommands returns the commands suitable for embedding in another CLI.
-// The caller is responsible for providing a fully populated conf; init-config
-// and version are excluded as they are specific to the standalone adr CLI.
+// The caller is responsible for providing a fully populated `conf`; init-config
+// and version are excluded as they are specific to the standalone `adr` CLI.
 func EmbedCommands(conf *config.Config) []*cobra.Command {
 	return []*cobra.Command{
 		NewInitCommand(conf),
@@ -19,7 +19,7 @@ func EmbedCommands(conf *config.Config) []*cobra.Command {
 	}
 }
 
-// AdrCommands returns the full command set for the standalone adr CLI,
+// AdrCommands returns the full command set for the standalone `adr` CLI,
 // including init-config (which discovers the project root and writes .adr.yaml)
 // and version.
 func AdrCommands(conf *config.Config) []*cobra.Command {

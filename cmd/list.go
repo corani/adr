@@ -12,7 +12,7 @@ func NewListCommand(conf *config.Config) *cobra.Command {
 	//nolint:exhaustruct
 	return &cobra.Command{
 		Use:   "list",
-		Short: "list all ADRs with their id, date and status",
+		Short: "List all ADRs with their id, date and status",
 		Run: func(_ *cobra.Command, _ []string) {
 			if err := app.List(conf); err != nil {
 				log.Printf("couldn't list adrs: %v", err)

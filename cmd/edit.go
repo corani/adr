@@ -14,7 +14,11 @@ func NewEditCommand(conf *config.Config) *cobra.Command {
 	//nolint:exhaustruct
 	return &cobra.Command{
 		Use:   "edit <id>",
-		Short: "open the adr with number <id> in the default editor",
+		Short: "Open the ADR with number <id> in the default editor",
+		Long: `Open the ADR with the given number in the default editor.
+
+The editor is determined by the $EDITOR environment variable. If $EDITOR is
+not set, the command will fail.`,
 		Args:  cobra.ExactArgs(1),
 		Run: func(_ *cobra.Command, args []string) {
 			ctx := context.TODO()

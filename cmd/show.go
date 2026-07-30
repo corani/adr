@@ -14,7 +14,11 @@ func NewShowCommand(conf *config.Config) *cobra.Command {
 	return &cobra.Command{
 		Use:     "show <id>",
 		Aliases: []string{"view"},
-		Short:   "show the adr with number <id>",
+		Short:   "Show the ADR with number <id>",
+		Long: `Show the ADR with the given number.
+
+Prints a summary table (number, date, status, filename) followed by the
+rendered markdown body of the ADR.`,
 		Args:    cobra.ExactArgs(1),
 		Run: func(_ *cobra.Command, args []string) {
 			number, err := strconv.Atoi(args[0])

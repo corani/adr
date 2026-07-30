@@ -15,7 +15,12 @@ func NewNewCommand(conf *config.Config) *cobra.Command {
 	return &cobra.Command{
 		Use:     "new [title]",
 		Aliases: []string{"add", "create"},
-		Short:   "create a new ADR with optional title",
+		Short:   "Create a new ADR with optional title",
+		Long: `Create a new ADR with an auto-incremented number and optional title.
+
+The title can be supplied as arguments or left empty to be filled in later.
+After creating the file, it is immediately opened in the default editor
+(see $EDITOR).`,
 		Run: func(_ *cobra.Command, args []string) {
 			ctx := context.TODO()
 			title := strings.Join(args, " ")
