@@ -5,11 +5,12 @@ import (
 	"log"
 	"strings"
 
+	"github.com/corani/adr/config"
 	"github.com/corani/adr/internal/app"
 	"github.com/spf13/cobra"
 )
 
-func NewNewCommand() *cobra.Command {
+func NewNewCommand(conf *config.Config) *cobra.Command {
 	//nolint:exhaustruct
 	return &cobra.Command{
 		Use:     "new [title]",
@@ -19,7 +20,7 @@ func NewNewCommand() *cobra.Command {
 			ctx := context.TODO()
 			title := strings.Join(args, " ")
 
-			if err := app.Create(ctx, title); err != nil {
+			if err := app.Create(ctx, conf, title); err != nil {
 				log.Printf("couldn't create adr: %v", err)
 			}
 		},

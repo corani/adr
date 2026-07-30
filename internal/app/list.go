@@ -4,17 +4,12 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/corani/adr/config"
 	"github.com/corani/adr/internal/adr"
-	"github.com/corani/adr/internal/config"
 	"github.com/jedib0t/go-pretty/v6/table"
 )
 
-func List() error {
-	conf, err := config.ReadConfig()
-	if err != nil {
-		return fmt.Errorf("%w: list: %w", ErrInternal, err)
-	}
-
+func List(conf *config.Config) error {
 	tbl := table.NewWriter()
 
 	tbl.SetOutputMirror(os.Stdout)
@@ -28,7 +23,7 @@ func List() error {
 	}})
 	tbl.AppendHeader(table.Row{"#", "date", "status", "title"})
 
-	err = adr.ForEach(conf, func(v *adr.Adr) error {
+	err := adr.ForEach(conf, func(v *adr.Adr) error {
 		tbl.AppendRow(table.Row{fmt.Sprintf("%04d", v.Number), v.Date, v.Status, v.Title})
 
 		return nil

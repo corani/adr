@@ -4,11 +4,12 @@ import (
 	"log"
 	"strconv"
 
+	"github.com/corani/adr/config"
 	"github.com/corani/adr/internal/app"
 	"github.com/spf13/cobra"
 )
 
-func NewShowCommand() *cobra.Command {
+func NewShowCommand(conf *config.Config) *cobra.Command {
 	//nolint:exhaustruct
 	return &cobra.Command{
 		Use:     "show <id>",
@@ -23,7 +24,7 @@ func NewShowCommand() *cobra.Command {
 				return
 			}
 
-			if err := app.Show(number); err != nil {
+			if err := app.Show(conf, number); err != nil {
 				log.Printf("couldn't show adr %d: %v", number, err)
 			}
 		},

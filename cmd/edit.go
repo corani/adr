@@ -5,11 +5,12 @@ import (
 	"log"
 	"strconv"
 
+	"github.com/corani/adr/config"
 	"github.com/corani/adr/internal/app"
 	"github.com/spf13/cobra"
 )
 
-func NewEditCommand() *cobra.Command {
+func NewEditCommand(conf *config.Config) *cobra.Command {
 	//nolint:exhaustruct
 	return &cobra.Command{
 		Use:   "edit <id>",
@@ -25,7 +26,7 @@ func NewEditCommand() *cobra.Command {
 				return
 			}
 
-			if err := app.Edit(ctx, number); err != nil {
+			if err := app.Edit(ctx, conf, number); err != nil {
 				log.Printf("couldn't edit adr %d: %v", number, err)
 			}
 		},

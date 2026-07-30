@@ -3,11 +3,12 @@ package cmd
 import (
 	"log"
 
+	"github.com/corani/adr/config"
 	"github.com/corani/adr/internal/app"
 	"github.com/spf13/cobra"
 )
 
-func NewInitCommand() *cobra.Command {
+func NewInitConfigCommand() *cobra.Command {
 	//nolint:exhaustruct
 	return &cobra.Command{
 		Use:   "init [path]",
@@ -20,7 +21,27 @@ func NewInitCommand() *cobra.Command {
 				path = args[0]
 			}
 
-			if err := app.Init(path); err != nil {
+			conf, err := app.InitConfig(path)
+			if err != nil {
+				log.Printf("couldn't initialize adr: %v", err)
+
+				return
+			}
+
+			if err := app.Init(conf); err != nil {
+				log.Printf("couldn't initialize adr: %v", err)
+			}
+		},
+	}
+}
+
+func NewInitCommand(conf *config.Config) *cobra.Command {
+	//nolint:exhaustruct
+	return &cobra.Command{
+		Use:   "init",
+		Short: "initialize the adr path",
+		Run: func(_ *cobra.Command, args []string) {
+			if err := app.Init(conf); err != nil {
 				log.Printf("couldn't initialize adr: %v", err)
 			}
 		},

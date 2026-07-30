@@ -1,4 +1,3 @@
-// Package config handles reading and writing the adr configuration file.
-// The configuration is stored as YAML alongside the ADR files and controls
-// the project root, ADR directory, and template paths.
+// Package config provides internal helpers for reading and writing the
+// .adr.yaml config file and discovering the project root.
 package config

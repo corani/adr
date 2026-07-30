@@ -5,11 +5,12 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/corani/adr/config"
 	"github.com/corani/adr/internal/app"
 	"github.com/spf13/cobra"
 )
 
-func NewUpdateCommand() *cobra.Command {
+func NewUpdateCommand(conf *config.Config) *cobra.Command {
 	//nolint:exhaustruct
 	return &cobra.Command{
 		Use:   "update <id> <status>",
@@ -25,7 +26,7 @@ func NewUpdateCommand() *cobra.Command {
 
 			status := strings.ToLower(args[1])
 
-			if err := app.Update(number, status); err != nil {
+			if err := app.Update(conf, number, status); err != nil {
 				log.Printf("couldn't update adr %d: %v", number, err)
 			}
 		},

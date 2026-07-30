@@ -23,13 +23,33 @@ THE SOFTWARE.
 package main
 
 import (
+	"log"
 	"os"
 
 	"github.com/corani/adr/cmd"
+	"github.com/corani/adr/internal/config"
+	"github.com/spf13/cobra"
 )
 
+func newRootCommand() *cobra.Command {
+	//nolint:exhaustruct
+	root := &cobra.Command{
+		Use:   os.Args[0],
+		Short: "A command line tool to maintain Architecture Decision Records",
+	}
+
+	conf, err := config.ReadConfig()
+	if err != nil && !os.IsNotExist(err) {
+		log.Printf("couldn't read config: %v", err)
+	}
+
+	root.AddCommand(cmd.AdrCommands(conf)...)
+
+	return root
+}
+
 func main() {
-	if err := cmd.NewRootCommand(os.Args[0]).Execute(); err != nil {
+	if err := newRootCommand().Execute(); err != nil {
 		os.Exit(1)
 	}
 }

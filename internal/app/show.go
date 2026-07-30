@@ -5,17 +5,12 @@ import (
 	"os"
 
 	markdown "github.com/MichaelMure/go-term-markdown"
+	"github.com/corani/adr/config"
 	"github.com/corani/adr/internal/adr"
-	"github.com/corani/adr/internal/config"
 	"github.com/jedib0t/go-pretty/v6/table"
 )
 
-func Show(number int) error {
-	conf, err := config.ReadConfig()
-	if err != nil {
-		return fmt.Errorf("%w: show: %w", ErrInternal, err)
-	}
-
+func Show(conf *config.Config, number int) error {
 	found, err := adr.ByID(conf, adr.Number(number))
 	if err != nil {
 		return fmt.Errorf("%w: show: %w", ErrInternal, err)
