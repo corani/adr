@@ -11,7 +11,7 @@ import (
 	"time"
 
 	"github.com/adrg/frontmatter"
-	"github.com/corani/adr/internal/config"
+	"github.com/corani/adr/config"
 	"github.com/gosimple/slug"
 	"gopkg.in/yaml.v3"
 )

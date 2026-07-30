@@ -6,15 +6,11 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/corani/adr/config"
 	"gopkg.in/yaml.v3"
 )
 
-type Config struct {
-	Project       string `yaml:"-"`
-	Root          string `yaml:"root"`
-	AdrTemplate   string `yaml:"adrTemplate"`
-	IndexTemplate string `yaml:"indexTemplate"`
-}
+type Config = config.Config
 
 func ProjectRoot() (string, error) {
 	cwd, err := os.Getwd()
@@ -43,7 +39,7 @@ func ProjectRoot() (string, error) {
 	return cwd, nil
 }
 
-func ReadConfig() (*Config, error) {
+func ReadConfig() (*config.Config, error) {
 	root, err := ProjectRoot()
 	if err != nil {
 		return nil, err
@@ -58,28 +54,28 @@ func ReadConfig() (*Config, error) {
 		}
 		defer out.Close() //nolint:errcheck
 
-		var config Config
+		var cfg config.Config
 
-		if err := yaml.NewDecoder(out).Decode(&config); err != nil {
+		if err := yaml.NewDecoder(out).Decode(&cfg); err != nil {
 			return nil, fmt.Errorf("%w: read: %w", ErrConfig, err)
 		}
 
-		config.Project = root
+		cfg.Project = root
 
-		return &config, nil
+		return &cfg, nil
 	}
 
 	return nil, os.ErrNotExist
 }
 
-func WriteConfig(root string, config *Config) error {
+func WriteConfig(root string, cfg *config.Config) error {
 	out, err := os.Create(filepath.Join(root, ".adr.yaml")) // #nosec G304
 	if err != nil {
 		return fmt.Errorf("%w: write: %w", ErrConfig, err)
 	}
 	defer out.Close() //nolint:errcheck
 
-	if err := yaml.NewEncoder(out).Encode(config); err != nil {
+	if err := yaml.NewEncoder(out).Encode(cfg); err != nil {
 		return fmt.Errorf("%w: write: %w", ErrConfig, err)
 	}
 

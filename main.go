@@ -19,12 +19,49 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
+
 package main
 
 import (
+	"log"
+	"os"
+
 	"github.com/corani/adr/cmd"
+	"github.com/corani/adr/internal/config"
+	"github.com/spf13/cobra"
 )
 
+func newRootCommand() *cobra.Command {
+	conf, err := config.ReadConfig()
+	if err != nil && !os.IsNotExist(err) {
+		log.Fatalf("couldn't read config: %v", err)
+	}
+
+	//nolint:exhaustruct
+	root := &cobra.Command{
+		Use:   os.Args[0],
+		Short: "A command line tool to maintain Architecture Decision Records",
+		PersistentPreRunE: func(c *cobra.Command, _ []string) error {
+			switch c.Name() {
+			case "init", "version", "help", "completion":
+				return nil
+			}
+
+			if conf == nil {
+				log.Fatal("no ADR configuration found, run 'adr init' first")
+			}
+
+			return nil
+		},
+	}
+
+	root.AddCommand(cmd.AdrCommands(conf)...)
+
+	return root
+}
+
 func main() {
-	cmd.Execute()
+	if err := newRootCommand().Execute(); err != nil {
+		os.Exit(1)
+	}
 }

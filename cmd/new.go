@@ -5,28 +5,29 @@ import (
 	"log"
 	"strings"
 
+	"github.com/corani/adr/config"
 	"github.com/corani/adr/internal/app"
 	"github.com/spf13/cobra"
 )
 
-// newCmd represents the new command.
-//
-//nolint:exhaustruct,gochecknoglobals
-var newCmd = &cobra.Command{
-	Use:     "new [title]",
-	Aliases: []string{"add", "create"},
-	Short:   "create a new ADR with optional title",
-	Run: func(_ *cobra.Command, args []string) {
-		ctx := context.TODO()
-		title := strings.Join(args, " ")
+func NewNewCommand(conf *config.Config) *cobra.Command {
+	//nolint:exhaustruct
+	return &cobra.Command{
+		Use:     "new [title]",
+		Aliases: []string{"add", "create"},
+		Short:   "Create a new ADR with optional title",
+		Long: `Create a new ADR with an auto-incremented number and optional title.
 
-		if err := app.Create(ctx, title); err != nil {
-			log.Printf("couldn't create adr: %v", err)
-		}
-	},
-}
+The title can be supplied as arguments or left empty to be filled in later.
+After creating the file, it is immediately opened in the default editor
+(see $EDITOR).`,
+		Run: func(_ *cobra.Command, args []string) {
+			ctx := context.TODO()
+			title := strings.Join(args, " ")
 
-//nolint:gochecknoinits
-func init() {
-	rootCmd.AddCommand(newCmd)
+			if err := app.Create(ctx, conf, title); err != nil {
+				log.Printf("couldn't create adr: %v", err)
+			}
+		},
+	}
 }

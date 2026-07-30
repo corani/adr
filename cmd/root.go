@@ -1,23 +1,35 @@
 package cmd
 
 import (
-	"os"
-
+	"github.com/corani/adr/config"
 	"github.com/spf13/cobra"
 )
 
-// rootCmd represents the base command when called without any subcommands.
-//
-//nolint:exhaustruct,gochecknoglobals
-var rootCmd = &cobra.Command{
-	Use:   "adr",
-	Short: "A command line tool to maintain Architecture Decision Records",
+// EmbedCommands returns the commands suitable for embedding in another CLI.
+// The caller is responsible for providing a fully populated `conf`; init-config
+// and version are excluded as they are specific to the standalone `adr` CLI.
+func EmbedCommands(conf *config.Config) []*cobra.Command {
+	return []*cobra.Command{
+		NewInitCommand(conf),
+		NewNewCommand(conf),
+		NewListCommand(conf),
+		NewShowCommand(conf),
+		NewEditCommand(conf),
+		NewUpdateCommand(conf),
+	}
 }
 
-// Execute adds all child commands to the root command and sets flags appropriately.
-// This is called by main.main(). It only needs to happen once to the rootCmd.
-func Execute() {
-	if err := rootCmd.Execute(); err != nil {
-		os.Exit(1)
+// AdrCommands returns the full command set for the standalone `adr` CLI,
+// including init-config (which discovers the project root and writes .adr.yaml)
+// and version.
+func AdrCommands(conf *config.Config) []*cobra.Command {
+	return []*cobra.Command{
+		NewInitConfigCommand(),
+		NewVersionCommand(),
+		NewNewCommand(conf),
+		NewListCommand(conf),
+		NewShowCommand(conf),
+		NewEditCommand(conf),
+		NewUpdateCommand(conf),
 	}
 }

@@ -5,33 +5,34 @@ import (
 	"log"
 	"strconv"
 
+	"github.com/corani/adr/config"
 	"github.com/corani/adr/internal/app"
 	"github.com/spf13/cobra"
 )
 
-// editCmd represents the edit command.
-//
-//nolint:exhaustruct,gochecknoglobals
-var editCmd = &cobra.Command{
-	Use:   "edit <id>",
-	Short: "open the adr with number <id> in the default editor",
-	Run: func(_ *cobra.Command, args []string) {
-		ctx := context.TODO()
+func NewEditCommand(conf *config.Config) *cobra.Command {
+	//nolint:exhaustruct
+	return &cobra.Command{
+		Use:   "edit <id>",
+		Short: "Open the ADR with number <id> in the default editor",
+		Long: `Open the ADR with the given number in the default editor.
 
-		number, err := strconv.Atoi(args[0])
-		if err != nil {
-			log.Printf("invalid argument: %v", err)
+The editor is determined by the $EDITOR environment variable. If $EDITOR is
+not set, the command will fail.`,
+		Args:  cobra.ExactArgs(1),
+		Run: func(_ *cobra.Command, args []string) {
+			ctx := context.TODO()
 
-			return
-		}
+			number, err := strconv.Atoi(args[0])
+			if err != nil {
+				log.Printf("invalid argument: %v", err)
 
-		if err := app.Edit(ctx, number); err != nil {
-			log.Printf("couldn't edit adr %d: %v", number, err)
-		}
-	},
-}
+				return
+			}
 
-//nolint:gochecknoinits
-func init() {
-	rootCmd.AddCommand(editCmd)
+			if err := app.Edit(ctx, conf, number); err != nil {
+				log.Printf("couldn't edit adr %d: %v", number, err)
+			}
+		},
+	}
 }

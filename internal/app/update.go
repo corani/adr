@@ -4,23 +4,19 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/corani/adr/config"
 	"github.com/corani/adr/internal/adr"
-	"github.com/corani/adr/internal/config"
 )
 
 var ErrInvalidStatus = errors.New("invalid status")
 
-func Update(number int, status string) error {
+func Update(conf *config.Config, number int, status string) error {
 	switch adr.Status(status) {
-	case adr.StatusProposed, adr.StatusAccepted, adr.StatusDeprecated, adr.StatusSuperseded:
-		// ok
+	case adr.StatusProposed, adr.StatusAccepted,
+		adr.StatusDeprecated, adr.StatusSuperseded:
+		// okay
 	default:
 		return fmt.Errorf("%w: %v", ErrInvalidStatus, status)
-	}
-
-	conf, err := config.ReadConfig()
-	if err != nil {
-		return fmt.Errorf("%w: update: %w", ErrInternal, err)
 	}
 
 	found, err := adr.ByID(conf, adr.Number(number))
