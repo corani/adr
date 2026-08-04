@@ -28,7 +28,7 @@ func List(conf *config.Config) error {
 
 	r, err := glamour.NewTermRenderer(
 		glamour.WithEnvironmentConfig(),
-		glamour.WithWordWrap(120),
+		glamour.WithWordWrap(0),
 	)
 	if err != nil {
 		return fmt.Errorf("%w: list: %w", ErrInternal, err)

@@ -27,7 +27,7 @@ func Show(conf *config.Config, number int) error {
 
 	r, err := glamour.NewTermRenderer(
 		glamour.WithEnvironmentConfig(),
-		glamour.WithWordWrap(80),
+		glamour.WithWordWrap(0),
 	)
 	if err != nil {
 		return fmt.Errorf("%w: show: %w", ErrInternal, err)
