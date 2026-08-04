@@ -2,37 +2,44 @@ package app
 
 import (
 	"fmt"
-	"os"
+	"slices"
+	"strings"
 
+	"charm.land/glamour/v2"
+	"charm.land/lipgloss/v2"
 	"github.com/corani/adr/config"
 	"github.com/corani/adr/internal/adr"
-	"github.com/jedib0t/go-pretty/v6/table"
 )
 
 func List(conf *config.Config) error {
-	tbl := table.NewWriter()
-
-	tbl.SetOutputMirror(os.Stdout)
-	tbl.SetStyle(table.StyleRounded)
-	tbl.SortBy([]table.SortBy{{
-		Name:       "#",
-		Mode:       table.AscNumeric,
-		Number:     0,
-		IgnoreCase: false,
-		CustomLess: nil,
-	}})
-	tbl.AppendHeader(table.Row{"#", "date", "status", "title"})
+	var rows []string
 
 	err := adr.ForEach(conf, func(v *adr.Adr) error {
-		tbl.AppendRow(table.Row{fmt.Sprintf("%04d", v.Number), v.Date, v.Status, v.Title})
-
+		rows = append(rows, fmt.Sprintf("| %04d | %s | %s | %s |", v.Number, v.Date, v.Status, v.Title))
 		return nil
 	})
 	if err != nil {
 		return fmt.Errorf("%w: list: %w", ErrInternal, err)
 	}
 
-	tbl.Render()
+	slices.Sort(rows)
+
+	md := "| # | date | status | title |\n|---|------|--------|-------|\n" + strings.Join(rows, "\n") + "\n"
+
+	r, err := glamour.NewTermRenderer(
+		glamour.WithEnvironmentConfig(),
+		glamour.WithWordWrap(120),
+	)
+	if err != nil {
+		return fmt.Errorf("%w: list: %w", ErrInternal, err)
+	}
+
+	out, err := r.Render(md)
+	if err != nil {
+		return fmt.Errorf("%w: list: %w", ErrInternal, err)
+	}
+
+	lipgloss.Print(out)
 
 	return nil
 }
