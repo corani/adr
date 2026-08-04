@@ -11,3 +11,4 @@ linters:
     - revive
     - noinlineerr
     - wsl
+    - gomodguard

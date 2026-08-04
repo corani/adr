@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 
 	"github.com/corani/adr/config"
-	"gopkg.in/yaml.v3"
+	"github.com/goccy/go-yaml"
 )
 
 type Config = config.Config

@@ -2,12 +2,12 @@ package app
 
 import (
 	"fmt"
-	"os"
+	"strings"
 
-	markdown "github.com/MichaelMure/go-term-markdown"
+	"charm.land/glamour/v2"
+	"charm.land/lipgloss/v2"
 	"github.com/corani/adr/config"
 	"github.com/corani/adr/internal/adr"
-	"github.com/jedib0t/go-pretty/v6/table"
 )
 
 func Show(conf *config.Config, number int) error {
@@ -16,28 +16,31 @@ func Show(conf *config.Config, number int) error {
 		return fmt.Errorf("%w: show: %w", ErrInternal, err)
 	}
 
-	tbl := table.NewWriter()
+	meta := strings.Join([]string{
+		"| field | value |",
+		"|-------|-------|",
+		fmt.Sprintf("| Filename | %s |", found.Filename),
+		fmt.Sprintf("| Number | %04d |", found.Number),
+		fmt.Sprintf("| Date | %s |", found.Date),
+		fmt.Sprintf("| Status | %s |", found.Status),
+	}, "\n") + "\n\n" + string(found.Body)
 
-	tbl.SetOutputMirror(os.Stdout)
-	tbl.SetStyle(table.StyleRounded)
-	tbl.AppendRows([]table.Row{
-		{"Filename", found.Filename},
-		{"Number", fmt.Sprintf("%04d", found.Number)},
-		{"Date", found.Date},
-		{"Status", found.Status},
-	})
-
-	tbl.Render()
-
-	const (
-		width  = 80
-		indent = 1
+	renderer, err := glamour.NewTermRenderer(
+		glamour.WithEnvironmentConfig(),
+		glamour.WithWordWrap(0),
 	)
+	if err != nil {
+		return fmt.Errorf("%w: show: %w", ErrInternal, err)
+	}
 
-	out := markdown.Render(string(found.Body), width, indent)
+	out, err := renderer.Render(meta)
+	if err != nil {
+		return fmt.Errorf("%w: show: %w", ErrInternal, err)
+	}
 
-	fmt.Println()
-	fmt.Println(string(out))
+	if _, err = lipgloss.Print(out); err != nil {
+		return fmt.Errorf("%w: show: %w", ErrInternal, err)
+	}
 
 	return nil
 }
