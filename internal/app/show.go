@@ -23,7 +23,7 @@ func Show(conf *config.Config, number int) error {
 		fmt.Sprintf("| Number | %04d |", found.Number),
 		fmt.Sprintf("| Date | %s |", found.Date),
 		fmt.Sprintf("| Status | %s |", found.Status),
-	}, "\n") + "\n\n" + string(found.Body)
+	}, "\n") + "\n\n" + reflowBody(string(found.Body))
 
 	renderer, err := glamour.NewTermRenderer(
 		glamour.WithEnvironmentConfig(),
