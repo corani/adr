@@ -1,21 +1,27 @@
 package app
 
 import (
+	"encoding/json"
 	"fmt"
+	"io"
+	"os"
 	"slices"
-	"strings"
 
-	"charm.land/glamour/v2"
-	"charm.land/lipgloss/v2"
 	"github.com/corani/adr/config"
 	"github.com/corani/adr/internal/adr"
 )
 
-func List(conf *config.Config) error {
-	var rows []string
+func List(conf *config.Config, format Format) error {
+	var entries []adrListEntry
 
-	err := adr.ForEach(conf, func(v *adr.Adr) error {
-		rows = append(rows, fmt.Sprintf("| %04d | %s | %s | %s |", v.Number, v.Date, v.Status, v.Title))
+	err := adr.ForEach(conf, func(entry *adr.Adr) error {
+		entries = append(entries, adrListEntry{
+			Number:   int(entry.Number),
+			Title:    entry.Title,
+			Status:   string(entry.Status),
+			Date:     entry.Date,
+			Filepath: entry.Filename,
+		})
 
 		return nil
 	})
@@ -23,24 +29,27 @@ func List(conf *config.Config) error {
 		return fmt.Errorf("%w: list: %w", ErrInternal, err)
 	}
 
-	slices.Sort(rows)
+	slices.SortFunc(entries, func(a, b adrListEntry) int {
+		return a.Number - b.Number
+	})
 
-	table := "| # | date | status | title |\n|---|------|--------|-------|\n" + strings.Join(rows, "\n") + "\n"
+	switch format {
+	case FormatJSON:
+		return listJSON(os.Stdout, entries)
+	case FormatRaw, FormatMd:
+		return renderMarkdownTable(os.Stdout, entries, format, "list")
+	default:
+		return fmt.Errorf("%w: list: unknown format %q", ErrInternal, format)
+	}
+}
 
-	renderer, err := glamour.NewTermRenderer(
-		glamour.WithEnvironmentConfig(),
-		glamour.WithWordWrap(0),
-	)
+func listJSON(writer io.Writer, entries []adrListEntry) error {
+	out, err := json.MarshalIndent(entries, "", "  ")
 	if err != nil {
 		return fmt.Errorf("%w: list: %w", ErrInternal, err)
 	}
 
-	out, err := renderer.Render(table)
-	if err != nil {
-		return fmt.Errorf("%w: list: %w", ErrInternal, err)
-	}
-
-	if _, err = lipgloss.Print(out); err != nil {
+	if _, err = fmt.Fprintln(writer, string(out)); err != nil {
 		return fmt.Errorf("%w: list: %w", ErrInternal, err)
 	}
 

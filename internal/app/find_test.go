@@ -44,12 +44,12 @@ func TestMatches(t *testing.T) {
 	t.Parallel()
 
 	entry := &adr.Adr{
-		Filename: "0001-use-postgresql.md",
+		Filename: testFilename,
 		Type:     "",
 		Number:   1,
-		Title:    "Use PostgreSQL for storage",
+		Title:    testTitle,
 		Status:   adr.StatusAccepted,
-		Date:     "2024-01-15",
+		Date:     testDate,
 		Link:     0,
 		Body:     []byte("We chose PostgreSQL because it supports JSONB."),
 	}
@@ -65,7 +65,7 @@ func TestMatches(t *testing.T) {
 		{"title no match", "mysql", false, false},
 		{"body not searched without flag", "jsonb", false, false},
 		{"body searched with flag", "jsonb", true, true},
-		{"status searched with flag", "accepted", true, true},
+		{"status searched with flag", testStatus, true, true},
 		{"date searched with flag", "2024-01", true, true},
 	}
 

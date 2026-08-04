@@ -11,6 +11,8 @@ import (
 func NewFindCommand(conf *config.Config) *cobra.Command {
 	var fullText bool
 
+	var format string
+
 	//nolint:exhaustruct
 	cmd := &cobra.Command{
 		Use:   "find <query>",
@@ -23,13 +25,21 @@ so "my search term" matches any title containing "my", then "search", then "term
 Use --text to also search frontmatter fields and the body.`,
 		Args: cobra.ExactArgs(1),
 		Run: func(_ *cobra.Command, args []string) {
-			if err := app.Find(conf, args[0], fullText); err != nil {
+			outputFormat, err := app.ParseFormat(format)
+			if err != nil {
+				log.Printf("invalid format %q: %v", format, err)
+
+				return
+			}
+
+			if err := app.Find(conf, args[0], fullText, outputFormat); err != nil {
 				log.Printf("couldn't find adrs: %v", err)
 			}
 		},
 	}
 
 	cmd.Flags().BoolVarP(&fullText, "text", "t", false, "also search frontmatter fields and body")
+	cmd.Flags().StringVarP(&format, "format", "f", string(app.FormatMd), "output format: md, raw, json")
 
 	return cmd
 }
