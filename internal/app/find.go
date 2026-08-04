@@ -1,25 +1,32 @@
 package app
 
 import (
+	"encoding/json"
 	"fmt"
+	"io"
+	"os"
 	"regexp"
 	"slices"
 	"strings"
 
-	"charm.land/glamour/v2"
-	"charm.land/lipgloss/v2"
 	"github.com/corani/adr/config"
 	"github.com/corani/adr/internal/adr"
 )
 
-func Find(conf *config.Config, query string, fullText bool) error {
+func Find(conf *config.Config, query string, fullText bool, format Format) error {
 	re := buildQuery(query)
 
-	var rows []string
+	var entries []adrListEntry
 
 	err := adr.ForEach(conf, func(entry *adr.Adr) error {
 		if matches(re, entry, fullText) {
-			rows = append(rows, fmt.Sprintf("| %04d | %s | %s | %s |", entry.Number, entry.Date, entry.Status, entry.Title))
+			entries = append(entries, adrListEntry{
+				Number:   int(entry.Number),
+				Title:    entry.Title,
+				Status:   string(entry.Status),
+				Date:     entry.Date,
+				Filepath: entry.Filename,
+			})
 		}
 
 		return nil
@@ -28,30 +35,33 @@ func Find(conf *config.Config, query string, fullText bool) error {
 		return fmt.Errorf("%w: find: %w", ErrInternal, err)
 	}
 
-	if len(rows) == 0 {
+	if len(entries) == 0 {
 		fmt.Println("no results")
 
 		return nil
 	}
 
-	slices.Sort(rows)
+	slices.SortFunc(entries, func(a, b adrListEntry) int {
+		return a.Number - b.Number
+	})
 
-	table := "| # | date | status | title |\n|---|------|--------|-------|\n" + strings.Join(rows, "\n") + "\n"
+	switch format {
+	case FormatJSON:
+		return findJSON(os.Stdout, entries)
+	case FormatRaw, FormatMd:
+		return renderMarkdownTable(os.Stdout, entries, format, "find")
+	default:
+		return fmt.Errorf("%w: find: unknown format %q", ErrInternal, format)
+	}
+}
 
-	renderer, err := glamour.NewTermRenderer(
-		glamour.WithEnvironmentConfig(),
-		glamour.WithWordWrap(0),
-	)
+func findJSON(writer io.Writer, entries []adrListEntry) error {
+	out, err := json.MarshalIndent(entries, "", "  ")
 	if err != nil {
 		return fmt.Errorf("%w: find: %w", ErrInternal, err)
 	}
 
-	out, err := renderer.Render(table)
-	if err != nil {
-		return fmt.Errorf("%w: find: %w", ErrInternal, err)
-	}
-
-	if _, err = lipgloss.Print(out); err != nil {
+	if _, err = fmt.Fprintln(writer, string(out)); err != nil {
 		return fmt.Errorf("%w: find: %w", ErrInternal, err)
 	}
 
