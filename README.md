@@ -15,6 +15,9 @@ A simple command-line tool to manage ADRs in markdown format.
   Open the ADR with the given id in your `$EDITOR`.
 - `adr list`
   List all ADRs with their status, date and title.
+- `adr find <query>`
+  Find ADRs whose title matches the query. Words are matched in order, case-insensitively, with
+  anything allowed between them. Use `--text` / `-t` to also search frontmatter fields and the body.
 - `adr update <id> <status>`
   Update the ADR with the given id, setting the status to one of: `proposed`, `accepted`,
   `deprecated` or `superseded`.
