@@ -24,7 +24,7 @@ The index (README.md) is regenerated automatically after the update.`,
 		Run: func(_ *cobra.Command, args []string) {
 			number, err := strconv.Atoi(args[0])
 			if err != nil {
-				log.Printf("invalid argument: %v", err)
+				log.Printf("invalid id %q: expected a number", args[0])
 
 				return
 			}

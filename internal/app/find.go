@@ -51,7 +51,7 @@ func Find(conf *config.Config, query string, fullText bool, format Format) error
 	case FormatRaw, FormatMd:
 		return renderMarkdownTable(os.Stdout, entries, format, "find")
 	default:
-		return fmt.Errorf("%w: find: unknown format %q", ErrInternal, format)
+		return fmt.Errorf("%w: find: unknown format %q: must be one of: md, raw, json", ErrInternal, format)
 	}
 }
 

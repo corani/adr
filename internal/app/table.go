@@ -16,7 +16,8 @@ func renderMarkdownTable(writer io.Writer, entries []adrListEntry, format Format
 		rows[i] = fmt.Sprintf("| %04d | %s | %s | %s |", e.Number, e.Date, e.Status, e.Title)
 	}
 
-	table := "| # | date | status | title |\n|---|------|--------|-------|\n" + strings.Join(rows, "\n") + "\n"
+	table := "| # | date | status | title |\n|---|------|--------|-------|\n" + strings.Join(rows, "\n") + "\n\n" +
+		"_Use `adr show <id>` to view a specific ADR._\n"
 
 	if format == FormatRaw {
 		if _, err := fmt.Fprint(writer, table); err != nil {

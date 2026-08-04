@@ -27,7 +27,7 @@ Use --text to also search frontmatter fields and the body.`,
 		Run: func(_ *cobra.Command, args []string) {
 			outputFormat, err := app.ParseFormat(format)
 			if err != nil {
-				log.Printf("invalid format %q: %v", format, err)
+				log.Printf("invalid format %q: must be one of: md, raw, json", format)
 
 				return
 			}

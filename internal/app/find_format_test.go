@@ -53,6 +53,12 @@ func TestFindMarkdownRaw(t *testing.T) {
 	if !strings.Contains(out, wantRow) {
 		t.Errorf("output missing %q\ngot: %s", wantRow, out)
 	}
+
+	const wantHint = "adr show <id>"
+
+	if !strings.Contains(out, wantHint) {
+		t.Errorf("output missing hint %q\ngot: %s", wantHint, out)
+	}
 }
 
 func TestMatchesFormat(t *testing.T) {

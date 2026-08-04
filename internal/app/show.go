@@ -34,7 +34,7 @@ func Show(conf *config.Config, number int, format Format) error {
 	case FormatRaw, FormatMd:
 		return showMarkdown(os.Stdout, found, format)
 	default:
-		return fmt.Errorf("%w: show: unknown format %q", ErrInternal, format)
+		return fmt.Errorf("%w: show: unknown format %q: must be one of: md, raw, json", ErrInternal, format)
 	}
 }
 

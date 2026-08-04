@@ -15,10 +15,15 @@ func NewListCommand(conf *config.Config) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "list",
 		Short: "List all ADRs with their id, date and status",
+		Long: `List all ADRs in the configured directory.
+
+Prints a table with each ADR's number, date, status, and title, sorted by
+number. Use --format to control output: md (rendered, default), raw (plain
+markdown table), or json (machine-readable).`,
 		Run: func(_ *cobra.Command, _ []string) {
 			outputFormat, err := app.ParseFormat(format)
 			if err != nil {
-				log.Printf("invalid format %q: %v", format, err)
+				log.Printf("invalid format %q: must be one of: md, raw, json", format)
 
 				return
 			}

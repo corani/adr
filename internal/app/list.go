@@ -39,7 +39,7 @@ func List(conf *config.Config, format Format) error {
 	case FormatRaw, FormatMd:
 		return renderMarkdownTable(os.Stdout, entries, format, "list")
 	default:
-		return fmt.Errorf("%w: list: unknown format %q", ErrInternal, format)
+		return fmt.Errorf("%w: list: unknown format %q: must be one of: md, raw, json", ErrInternal, format)
 	}
 }
 

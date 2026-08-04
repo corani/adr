@@ -25,7 +25,7 @@ not set, the command will fail.`,
 
 			number, err := strconv.Atoi(args[0])
 			if err != nil {
-				log.Printf("invalid argument: %v", err)
+				log.Printf("invalid id %q: expected a number", args[0])
 
 				return
 			}
