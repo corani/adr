@@ -25,14 +25,14 @@ rendered markdown body of the ADR.`,
 		Run: func(_ *cobra.Command, args []string) {
 			number, err := strconv.Atoi(args[0])
 			if err != nil {
-				log.Printf("invalid argument: %v", err)
+				log.Printf("invalid id %q: expected a number", args[0])
 
 				return
 			}
 
 			outputFormat, err := app.ParseFormat(format)
 			if err != nil {
-				log.Printf("invalid format %q: %v", format, err)
+				log.Printf("invalid format %q: must be one of: md, raw, json", format)
 
 				return
 			}

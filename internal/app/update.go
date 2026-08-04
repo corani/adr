@@ -16,7 +16,7 @@ func Update(conf *config.Config, number int, status string) error {
 		adr.StatusDeprecated, adr.StatusSuperseded:
 		// okay
 	default:
-		return fmt.Errorf("%w: %v", ErrInvalidStatus, status)
+		return fmt.Errorf("%w: %q: must be one of: proposed, accepted, deprecated, superseded", ErrInvalidStatus, status)
 	}
 
 	found, err := adr.ByID(conf, adr.Number(number))
