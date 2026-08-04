@@ -16,6 +16,7 @@ func List(conf *config.Config) error {
 
 	err := adr.ForEach(conf, func(v *adr.Adr) error {
 		rows = append(rows, fmt.Sprintf("| %04d | %s | %s | %s |", v.Number, v.Date, v.Status, v.Title))
+
 		return nil
 	})
 	if err != nil {
@@ -24,9 +25,9 @@ func List(conf *config.Config) error {
 
 	slices.Sort(rows)
 
-	md := "| # | date | status | title |\n|---|------|--------|-------|\n" + strings.Join(rows, "\n") + "\n"
+	table := "| # | date | status | title |\n|---|------|--------|-------|\n" + strings.Join(rows, "\n") + "\n"
 
-	r, err := glamour.NewTermRenderer(
+	renderer, err := glamour.NewTermRenderer(
 		glamour.WithEnvironmentConfig(),
 		glamour.WithWordWrap(0),
 	)
@@ -34,12 +35,14 @@ func List(conf *config.Config) error {
 		return fmt.Errorf("%w: list: %w", ErrInternal, err)
 	}
 
-	out, err := r.Render(md)
+	out, err := renderer.Render(table)
 	if err != nil {
 		return fmt.Errorf("%w: list: %w", ErrInternal, err)
 	}
 
-	lipgloss.Print(out)
+	if _, err = lipgloss.Print(out); err != nil {
+		return fmt.Errorf("%w: list: %w", ErrInternal, err)
+	}
 
 	return nil
 }

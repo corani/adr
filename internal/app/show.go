@@ -25,7 +25,7 @@ func Show(conf *config.Config, number int) error {
 		fmt.Sprintf("| Status | %s |", found.Status),
 	}, "\n") + "\n\n" + string(found.Body)
 
-	r, err := glamour.NewTermRenderer(
+	renderer, err := glamour.NewTermRenderer(
 		glamour.WithEnvironmentConfig(),
 		glamour.WithWordWrap(0),
 	)
@@ -33,12 +33,14 @@ func Show(conf *config.Config, number int) error {
 		return fmt.Errorf("%w: show: %w", ErrInternal, err)
 	}
 
-	out, err := r.Render(meta)
+	out, err := renderer.Render(meta)
 	if err != nil {
 		return fmt.Errorf("%w: show: %w", ErrInternal, err)
 	}
 
-	lipgloss.Print(out)
+	if _, err = lipgloss.Print(out); err != nil {
+		return fmt.Errorf("%w: show: %w", ErrInternal, err)
+	}
 
 	return nil
 }
