@@ -9,7 +9,7 @@ require (
 	github.com/goccy/go-yaml v1.19.2
 	github.com/gosimple/slug v1.15.0
 	github.com/spf13/cobra v1.10.2
-	golang.org/x/term v0.43.0
+	golang.org/x/term v0.45.0
 )
 
 require (
