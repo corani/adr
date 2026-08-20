@@ -9,7 +9,7 @@ import (
 )
 
 func NewVersionCommand() *cobra.Command {
-	//nolint:exhaustruct
+	//nolint:exhaustruct_v5
 	return &cobra.Command{
 		Use:   "version",
 		Short: "Show the version information",
