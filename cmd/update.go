@@ -11,7 +11,7 @@ import (
 )
 
 func NewUpdateCommand(conf *config.Config) *cobra.Command {
-	//nolint:exhaustruct
+	//nolint:exhaustruct_v5
 	return &cobra.Command{
 		Use:   "update <id> <status>",
 		Short: "Update the ADR with number <id> to status <status>",
@@ -20,7 +20,7 @@ func NewUpdateCommand(conf *config.Config) *cobra.Command {
 Valid statuses are: proposed, accepted, deprecated, superseded.
 
 The index (README.md) is regenerated automatically after the update.`,
-		Args:  cobra.ExactArgs(2), //nolint:mnd
+		Args: cobra.ExactArgs(2), //nolint:mnd
 		Run: func(_ *cobra.Command, args []string) {
 			number, err := strconv.Atoi(args[0])
 			if err != nil {

@@ -13,7 +13,7 @@ func NewFindCommand(conf *config.Config) *cobra.Command {
 
 	var format string
 
-	//nolint:exhaustruct
+	//nolint:exhaustruct_v5
 	cmd := &cobra.Command{
 		Use:   "find <query>",
 		Short: "Find ADRs matching a query",

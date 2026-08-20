@@ -12,7 +12,7 @@ import (
 func NewShowCommand(conf *config.Config) *cobra.Command {
 	var format string
 
-	//nolint:exhaustruct
+	//nolint:exhaustruct_v5
 	cmd := &cobra.Command{
 		Use:     "show <id>",
 		Aliases: []string{"view"},

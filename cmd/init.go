@@ -9,7 +9,7 @@ import (
 )
 
 func NewInitConfigCommand() *cobra.Command {
-	//nolint:exhaustruct
+	//nolint:exhaustruct_v5
 	return &cobra.Command{
 		Use:   "init [path]",
 		Short: "Initialize the ADR path (default is `docs/adr`)",
@@ -22,7 +22,7 @@ is found.
 
 The path argument sets the ADR directory relative to the project root
 (default: docs/adr).`,
-		Args:  cobra.MaximumNArgs(1),
+		Args: cobra.MaximumNArgs(1),
 		Run: func(_ *cobra.Command, args []string) {
 			path := "docs/adr"
 
@@ -45,7 +45,7 @@ The path argument sets the ADR directory relative to the project root
 }
 
 func NewInitCommand(conf *config.Config) *cobra.Command {
-	//nolint:exhaustruct
+	//nolint:exhaustruct_v5
 	return &cobra.Command{
 		Use:   "init",
 		Short: "Initialize the ADR path",

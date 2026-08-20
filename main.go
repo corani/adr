@@ -37,7 +37,7 @@ func newRootCommand() *cobra.Command {
 		log.Fatalf("couldn't read config: %v", err)
 	}
 
-	//nolint:exhaustruct
+	//nolint:exhaustruct_v5
 	root := &cobra.Command{
 		Use:   os.Args[0],
 		Short: "A command line tool to maintain Architecture Decision Records",

@@ -12,3 +12,4 @@ linters:
     - noinlineerr
     - wsl
     - gomodguard
+    - exhaustruct       # deprecated, replaced by exhaustruct_v5

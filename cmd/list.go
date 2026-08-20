@@ -11,7 +11,7 @@ import (
 func NewListCommand(conf *config.Config) *cobra.Command {
 	var format string
 
-	//nolint:exhaustruct
+	//nolint:exhaustruct_v5
 	cmd := &cobra.Command{
 		Use:   "list",
 		Short: "List all ADRs with their id, date and status",

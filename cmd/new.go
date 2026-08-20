@@ -11,7 +11,7 @@ import (
 )
 
 func NewNewCommand(conf *config.Config) *cobra.Command {
-	//nolint:exhaustruct
+	//nolint:exhaustruct_v5
 	return &cobra.Command{
 		Use:     "new [title]",
 		Aliases: []string{"add", "create"},
