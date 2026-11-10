@@ -1,10 +1,10 @@
 module github.com/corani/adr
 
-go 1.26.0
+go 1.26.7
 
 require (
 	charm.land/glamour/v2 v2.0.1
-	charm.land/lipgloss/v2 v2.0.6
+	charm.land/lipgloss/v2 v2.1.0
 	github.com/adrg/frontmatter v0.2.0
 	github.com/goccy/go-yaml v1.19.2
 	github.com/gosimple/slug v1.15.0
